@@ -3,6 +3,7 @@ package fr.codecake.chatgptchallenge.flow.message.service.dto;
 import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 public class FlowMessageQueryDTO implements Serializable {
 
@@ -12,7 +13,7 @@ public class FlowMessageQueryDTO implements Serializable {
     @NotNull
     private Boolean isNewConversation;
 
-    private Long conversationPublicId;
+    private UUID conversationPublicId;
 
     public String getContent() {
         return content;
@@ -30,11 +31,11 @@ public class FlowMessageQueryDTO implements Serializable {
         isNewConversation = newConversation;
     }
 
-    public Long getConversationPublicId() {
+    public UUID getConversationPublicId() {
         return conversationPublicId;
     }
 
-    public void setConversationPublicId(Long conversationPublicId) {
+    public void setConversationPublicId(UUID conversationPublicId) {
         this.conversationPublicId = conversationPublicId;
     }
 }

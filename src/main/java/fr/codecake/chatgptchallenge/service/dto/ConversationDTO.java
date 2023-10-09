@@ -1,6 +1,7 @@
 package fr.codecake.chatgptchallenge.service.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -17,7 +18,7 @@ public class ConversationDTO implements Serializable {
 
     private UUID publicId;
 
-    private List<MessageDTO> messages;
+    private List<MessageDTO> messages = new ArrayList<>();
 
 
     public Long getId() {
