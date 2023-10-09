@@ -24,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Base64Utils;
 
 /**
  * Integration tests for the {@link MessageResource} REST controller.
@@ -288,7 +289,7 @@ class MessageResourceIT {
         Message partialUpdatedMessage = new Message();
         partialUpdatedMessage.setId(message.getId());
 
-        partialUpdatedMessage.owner(UPDATED_OWNER);
+        partialUpdatedMessage.content(UPDATED_CONTENT);
 
         restMessageMockMvc
             .perform(
@@ -303,8 +304,8 @@ class MessageResourceIT {
         List<Message> messageList = messageRepository.findAll();
         assertThat(messageList).hasSize(databaseSizeBeforeUpdate);
         Message testMessage = messageList.get(messageList.size() - 1);
-        assertThat(testMessage.getContent()).isEqualTo(DEFAULT_CONTENT);
-        assertThat(testMessage.getOwner()).isEqualTo(UPDATED_OWNER);
+        assertThat(testMessage.getContent()).isEqualTo(UPDATED_CONTENT);
+        assertThat(testMessage.getOwner()).isEqualTo(DEFAULT_OWNER);
     }
 
     @Test

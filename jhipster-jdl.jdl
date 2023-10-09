@@ -1,6 +1,5 @@
-
 entity Conversation {
-	name String
+	name String,
     publicId UUID
 }
 
@@ -9,12 +8,25 @@ entity Message {
     owner Owner
 }
 
+entity Profile {
+    subscription UserSubscription
+}
+
 enum Owner {
     USER, GPT
 }
 
+enum UserSubscription {
+    FREE, PAID
+}
+
 relationship OneToMany {
 	Conversation to Message{conversation},
+    Profile to Conversation{profile}
+}
+
+relationship OneToOne {
+    Profile{user} to User with builtInEntity
 }
 
 paginate * with pagination

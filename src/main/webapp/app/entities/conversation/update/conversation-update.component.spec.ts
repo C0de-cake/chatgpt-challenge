@@ -9,6 +9,8 @@ import { of, Subject, from } from 'rxjs';
 import { ConversationFormService } from './conversation-form.service';
 import { ConversationService } from '../service/conversation.service';
 import { IConversation } from '../conversation.model';
+import { IProfile } from 'app/entities/profile/profile.model';
+import { ProfileService } from 'app/entities/profile/service/profile.service';
 
 import { ConversationUpdateComponent } from './conversation-update.component';
 
@@ -18,6 +20,7 @@ describe('Conversation Management Update Component', () => {
   let activatedRoute: ActivatedRoute;
   let conversationFormService: ConversationFormService;
   let conversationService: ConversationService;
+  let profileService: ProfileService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -39,17 +42,43 @@ describe('Conversation Management Update Component', () => {
     activatedRoute = TestBed.inject(ActivatedRoute);
     conversationFormService = TestBed.inject(ConversationFormService);
     conversationService = TestBed.inject(ConversationService);
+    profileService = TestBed.inject(ProfileService);
 
     comp = fixture.componentInstance;
   });
 
   describe('ngOnInit', () => {
-    it('Should update editForm', () => {
+    it('Should call Profile query and add missing value', () => {
       const conversation: IConversation = { id: 456 };
+      const profile: IProfile = { id: 7142 };
+      conversation.profile = profile;
+
+      const profileCollection: IProfile[] = [{ id: 18780 }];
+      jest.spyOn(profileService, 'query').mockReturnValue(of(new HttpResponse({ body: profileCollection })));
+      const additionalProfiles = [profile];
+      const expectedCollection: IProfile[] = [...additionalProfiles, ...profileCollection];
+      jest.spyOn(profileService, 'addProfileToCollectionIfMissing').mockReturnValue(expectedCollection);
 
       activatedRoute.data = of({ conversation });
       comp.ngOnInit();
 
+      expect(profileService.query).toHaveBeenCalled();
+      expect(profileService.addProfileToCollectionIfMissing).toHaveBeenCalledWith(
+        profileCollection,
+        ...additionalProfiles.map(expect.objectContaining)
+      );
+      expect(comp.profilesSharedCollection).toEqual(expectedCollection);
+    });
+
+    it('Should update editForm', () => {
+      const conversation: IConversation = { id: 456 };
+      const profile: IProfile = { id: 8708 };
+      conversation.profile = profile;
+
+      activatedRoute.data = of({ conversation });
+      comp.ngOnInit();
+
+      expect(comp.profilesSharedCollection).toContain(profile);
       expect(comp.conversation).toEqual(conversation);
     });
   });
@@ -119,6 +148,18 @@ describe('Conversation Management Update Component', () => {
       expect(conversationService.update).toHaveBeenCalled();
       expect(comp.isSaving).toEqual(false);
       expect(comp.previousState).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Compare relationships', () => {
+    describe('compareProfile', () => {
+      it('Should forward to profileService', () => {
+        const entity = { id: 123 };
+        const entity2 = { id: 456 };
+        jest.spyOn(profileService, 'compareProfile');
+        comp.compareProfile(entity, entity2);
+        expect(profileService.compareProfile).toHaveBeenCalledWith(entity, entity2);
+      });
     });
   });
 });

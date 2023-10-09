@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { finalize, map } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -10,6 +10,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ConversationFormService, ConversationFormGroup } from './conversation-form.service';
 import { IConversation } from '../conversation.model';
 import { ConversationService } from '../service/conversation.service';
+import { IProfile } from 'app/entities/profile/profile.model';
+import { ProfileService } from 'app/entities/profile/service/profile.service';
 
 @Component({
   standalone: true,
@@ -21,13 +23,18 @@ export class ConversationUpdateComponent implements OnInit {
   isSaving = false;
   conversation: IConversation | null = null;
 
+  profilesSharedCollection: IProfile[] = [];
+
   editForm: ConversationFormGroup = this.conversationFormService.createConversationFormGroup();
 
   constructor(
     protected conversationService: ConversationService,
     protected conversationFormService: ConversationFormService,
+    protected profileService: ProfileService,
     protected activatedRoute: ActivatedRoute
   ) {}
+
+  compareProfile = (o1: IProfile | null, o2: IProfile | null): boolean => this.profileService.compareProfile(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ conversation }) => {
@@ -35,6 +42,8 @@ export class ConversationUpdateComponent implements OnInit {
       if (conversation) {
         this.updateForm(conversation);
       }
+
+      this.loadRelationshipsOptions();
     });
   }
 
@@ -74,5 +83,20 @@ export class ConversationUpdateComponent implements OnInit {
   protected updateForm(conversation: IConversation): void {
     this.conversation = conversation;
     this.conversationFormService.resetForm(this.editForm, conversation);
+
+    this.profilesSharedCollection = this.profileService.addProfileToCollectionIfMissing<IProfile>(
+      this.profilesSharedCollection,
+      conversation.profile
+    );
+  }
+
+  protected loadRelationshipsOptions(): void {
+    this.profileService
+      .query()
+      .pipe(map((res: HttpResponse<IProfile[]>) => res.body ?? []))
+      .pipe(
+        map((profiles: IProfile[]) => this.profileService.addProfileToCollectionIfMissing<IProfile>(profiles, this.conversation?.profile))
+      )
+      .subscribe((profiles: IProfile[]) => (this.profilesSharedCollection = profiles));
   }
 }

@@ -1,18 +1,19 @@
 import { IConversation, NewConversation } from './conversation.model';
 
 export const sampleWithRequiredData: IConversation = {
-  id: 12943,
+  id: 19776,
 };
 
 export const sampleWithPartialData: IConversation = {
-  id: 11069,
-  name: 'Yuan',
+  id: 29629,
+  name: 'Human Alabama',
+  publicId: '8e24b311-d1af-4b09-bc84-2660d54a395c',
 };
 
 export const sampleWithFullData: IConversation = {
-  id: 29816,
-  name: 'East Customizable boo',
-  publicId: '023cbe66-be69-4e81-bb78-daa0aaafed75',
+  id: 12434,
+  name: 'Bicycle auxiliary why',
+  publicId: '4b4f6722-aae8-4984-80dc-e9077e4e5e7b',
 };
 
 export const sampleWithNewData: NewConversation = {

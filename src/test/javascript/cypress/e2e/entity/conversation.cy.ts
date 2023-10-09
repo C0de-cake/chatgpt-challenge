@@ -160,11 +160,11 @@ describe('Conversation e2e test', () => {
     });
 
     it('should create an instance of Conversation', () => {
-      cy.get(`[data-cy="name"]`).type('Cotton');
-      cy.get(`[data-cy="name"]`).should('have.value', 'Cotton');
+      cy.get(`[data-cy="name"]`).type('whether');
+      cy.get(`[data-cy="name"]`).should('have.value', 'whether');
 
-      cy.get(`[data-cy="publicId"]`).type('0b00699d-46a3-48fe-aaa0-f81fae908736');
-      cy.get(`[data-cy="publicId"]`).invoke('val').should('match', new RegExp('0b00699d-46a3-48fe-aaa0-f81fae908736'));
+      cy.get(`[data-cy="publicId"]`).type('1cd34da1-605c-41c2-838b-d011f265b4a3');
+      cy.get(`[data-cy="publicId"]`).invoke('val').should('match', new RegExp('1cd34da1-605c-41c2-838b-d011f265b4a3'));
 
       cy.get(entityCreateSaveButtonSelector).click();
 

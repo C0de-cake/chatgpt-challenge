@@ -3,17 +3,17 @@ import { Owner } from 'app/entities/enumerations/owner.model';
 import { IMessage, NewMessage } from './message.model';
 
 export const sampleWithRequiredData: IMessage = {
-  id: 23286,
+  id: 17002,
 };
 
 export const sampleWithPartialData: IMessage = {
-  id: 4370,
+  id: 9419,
 };
 
 export const sampleWithFullData: IMessage = {
-  id: 17126,
+  id: 8193,
   content: '../fake-data/blob/hipster.txt',
-  owner: 'USER',
+  owner: 'GPT',
 };
 
 export const sampleWithNewData: NewMessage = {

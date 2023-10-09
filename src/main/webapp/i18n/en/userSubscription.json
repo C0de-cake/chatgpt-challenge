@@ -1,0 +1,9 @@
+{
+  "chatgptChallengeApp": {
+    "UserSubscription": {
+      "null": "",
+      "FREE": "FREE",
+      "PAID": "PAID"
+    }
+  }
+}

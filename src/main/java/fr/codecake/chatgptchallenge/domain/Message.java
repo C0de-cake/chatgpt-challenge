@@ -33,7 +33,7 @@ public class Message implements Serializable {
     private Owner owner;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "messages" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "messages", "profile" }, allowSetters = true)
     private Conversation conversation;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

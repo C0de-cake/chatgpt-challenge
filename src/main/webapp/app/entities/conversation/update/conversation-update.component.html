@@ -26,6 +26,21 @@
           <label class="form-label" jhiTranslate="chatgptChallengeApp.conversation.publicId" for="field_publicId">Public Id</label>
           <input type="text" class="form-control" name="publicId" id="field_publicId" data-cy="publicId" formControlName="publicId" />
         </div>
+
+        <div class="mb-3">
+          <label class="form-label" jhiTranslate="chatgptChallengeApp.conversation.profile" for="field_profile">Profile</label>
+          <select
+            class="form-control"
+            id="field_profile"
+            data-cy="profile"
+            name="profile"
+            formControlName="profile"
+            [compareWith]="compareProfile"
+          >
+            <option [ngValue]="null"></option>
+            <option [ngValue]="profileOption" *ngFor="let profileOption of profilesSharedCollection">{{ profileOption.id }}</option>
+          </select>
+        </div>
       </div>
 
       <div>

@@ -14,6 +14,11 @@ import { RouterModule } from '@angular/router';
         data: { pageTitle: 'chatgptChallengeApp.message.home.title' },
         loadChildren: () => import('./message/message.routes'),
       },
+      {
+        path: 'profile',
+        data: { pageTitle: 'chatgptChallengeApp.profile.home.title' },
+        loadChildren: () => import('./profile/profile.routes'),
+      },
       /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
     ]),
   ],

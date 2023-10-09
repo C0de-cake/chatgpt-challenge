@@ -1,0 +1,33 @@
+{
+  "applications": "*",
+  "changelogDate": "20230728031438",
+  "dto": "mapstruct",
+  "entityTableName": "profile",
+  "fields": [
+    {
+      "fieldName": "subscription",
+      "fieldType": "UserSubscription",
+      "fieldValues": "FREE,PAID"
+    }
+  ],
+  "name": "Profile",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "user",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one",
+      "relationshipWithBuiltInEntity": true
+    },
+    {
+      "otherEntityName": "conversation",
+      "otherEntityRelationshipName": "profile",
+      "relationshipName": "conversation",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

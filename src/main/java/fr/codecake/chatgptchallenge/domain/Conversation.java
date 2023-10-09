@@ -37,6 +37,10 @@ public class Conversation implements Serializable {
     @JsonIgnoreProperties(value = { "conversation" }, allowSetters = true)
     private Set<Message> messages = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "user", "conversations" }, allowSetters = true)
+    private Profile profile;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -106,6 +110,19 @@ public class Conversation implements Serializable {
     public Conversation removeMessage(Message message) {
         this.messages.remove(message);
         message.setConversation(null);
+        return this;
+    }
+
+    public Profile getProfile() {
+        return this.profile;
+    }
+
+    public void setProfile(Profile profile) {
+        this.profile = profile;
+    }
+
+    public Conversation profile(Profile profile) {
+        this.setProfile(profile);
         return this;
     }
 

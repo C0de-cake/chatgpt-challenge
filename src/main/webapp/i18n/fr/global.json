@@ -9,6 +9,7 @@
         "main": "Entités",
         "conversation": "Conversation",
         "message": "Message",
+        "profile": "Profile",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

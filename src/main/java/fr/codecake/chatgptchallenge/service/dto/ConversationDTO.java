@@ -18,8 +18,9 @@ public class ConversationDTO implements Serializable {
 
     private UUID publicId;
 
-    private List<MessageDTO> messages = new ArrayList<>();
+    private ProfileDTO profile;
 
+    private List<MessageDTO> messages = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -43,6 +44,14 @@ public class ConversationDTO implements Serializable {
 
     public void setPublicId(UUID publicId) {
         this.publicId = publicId;
+    }
+
+    public ProfileDTO getProfile() {
+        return profile;
+    }
+
+    public void setProfile(ProfileDTO profile) {
+        this.profile = profile;
     }
 
     public List<MessageDTO> getMessages() {
@@ -81,6 +90,7 @@ public class ConversationDTO implements Serializable {
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", publicId='" + getPublicId() + "'" +
+            ", profile=" + getProfile() +
             "}";
     }
 }

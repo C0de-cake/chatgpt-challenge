@@ -22,6 +22,12 @@
         <dd>
           <span>{{ conversation.publicId }}</span>
         </dd>
+        <dt><span jhiTranslate="chatgptChallengeApp.conversation.profile">Profile</span></dt>
+        <dd>
+          <div *ngIf="conversation.profile">
+            <a [routerLink]="['/profile', conversation.profile.id, 'view']">{{ conversation.profile.id }}</a>
+          </div>
+        </dd>
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
