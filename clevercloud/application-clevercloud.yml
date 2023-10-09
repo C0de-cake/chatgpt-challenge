@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://${POSTGRESQL_ADDON_HOST}:${POSTGRESQL_ADDON_PORT}/${POSTGRESQL_ADDON_DB}?useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: ${POSTGRESQL_ADDON_USER}
+    password: ${POSTGRESQL_ADDON_PASSWORD}
+    hikari:
+      maximumPoolSize: 2
+      schema: ${SCHEMA_DB}
+  jpa:
+    database-platform: tech.jhipster.domain.util.FixedPostgreSQL10Dialect
+    liquibase:
+      contexts: prod
+  security:
+    oauth2:
+      client:
+        registration:
+          provider:
+            oidc:
+              issuer-uri: ${SSO_PROVIDER_OIDC_ISSUER_URI}
+          oidc:
+            client-id: ${SSO_CLIENT_ID}
+            client-secret: ${SSO_CLIENT_SECRET}

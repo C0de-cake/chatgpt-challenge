@@ -1,0 +1,11 @@
+{
+  "apps": [
+    {
+      "app_id": "app_f87372ba-e335-4e25-825f-97be35eeed10",
+      "org_id": "user_91af6734-62bf-4753-bbf3-40e564cbf829",
+      "deploy_url": "https://push-n2-par-clevercloud-customers.services.clever-cloud.com/app_f87372ba-e335-4e25-825f-97be35eeed10.git",
+      "name": "chatgpt-challenge",
+      "alias": "chatgpt-challenge"
+    }
+  ]
+}
