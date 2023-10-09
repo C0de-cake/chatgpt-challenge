@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {Router, RouterModule} from '@angular/router';
 
 import SharedModule from 'app/shared/shared.module';
-import { LoginService } from 'app/login/login.service';
-import { AccountService } from 'app/core/auth/account.service';
-import { Account } from 'app/core/auth/account.model';
+import {LoginService} from 'app/login/login.service';
+import {AccountService} from 'app/core/auth/account.service';
+import {Account} from 'app/core/auth/account.model';
 
 @Component({
   standalone: true,
@@ -16,10 +16,19 @@ import { Account } from 'app/core/auth/account.model';
 export default class HomeComponent implements OnInit {
   account: Account | null = null;
 
-  constructor(private accountService: AccountService, private loginService: LoginService) {}
+  constructor(private accountService: AccountService,
+              private loginService: LoginService,
+              private router: Router) {
+  }
 
   ngOnInit(): void {
-    this.accountService.identity().subscribe(account => (this.account = account));
+    this.accountService.identity().subscribe(account => {
+        this.account = account;
+        if (this.account) {
+          this.router.navigate(['chat']);
+        }
+      }
+    );
   }
 
   login(): void {
