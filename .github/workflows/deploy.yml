@@ -1,0 +1,22 @@
+name: Release
+on:
+  push:
+    branches:
+      - master
+      - configure-deploy-cloud
+jobs:
+  pipeline:
+    name: Deploy pipeline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Prepare deploy
+        run: |
+          git fetch --prune --unshallow
+          wget https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
+          tar xvzf clever-tools-latest_linux.tar.gz
+          ./clever-tools-latest_linux/clever login --token ${{ secrets.CLEVER_TOKEN }} --secret ${{ secrets.CLEVER_SECRET }}
+      - name: Deploy on prod
+        run: |
+          ./clever-tools-latest_linux/clever link app_f87372ba-e335-4e25-825f-97be35eeed10
+          ./clever-tools-latest_linux/clever deploy -f -a chatgpt-challenge
