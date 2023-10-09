@@ -5,6 +5,7 @@ import fr.codecake.chatgptchallenge.domain.Message;
 import fr.codecake.chatgptchallenge.repository.ConversationRepository;
 import fr.codecake.chatgptchallenge.service.dto.ConversationDTO;
 import fr.codecake.chatgptchallenge.service.dto.MessageDTO;
+import fr.codecake.chatgptchallenge.service.dto.ProfileDTO;
 import fr.codecake.chatgptchallenge.service.mapper.ConversationMapper;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,13 +33,16 @@ public class ConversationService {
 
     private final ConversationMapper conversationMapper;
     private final MessageService messageService;
+    private final ConnectedUserService connectedUserService;
 
     public ConversationService(ConversationRepository conversationRepository,
                                ConversationMapper conversationMapper,
-                               MessageService messageService) {
+                               MessageService messageService,
+                               ConnectedUserService connectedUserService) {
         this.conversationRepository = conversationRepository;
         this.conversationMapper = conversationMapper;
         this.messageService = messageService;
+        this.connectedUserService = connectedUserService;
     }
 
     /**
@@ -134,9 +139,17 @@ public class ConversationService {
         return conversationDTO;
     }
 
-//    @Transactional(readOnly = true)
-//    public Optional<ConversationDTO> findOneByPublicId(UUID publicId) {
-//        log.debug("Request to get Conversation by public id : {}", publicId);
-//        return conversationRepository.findOneByPublicId(publicId).map(conversationMapper::toDto);
-//    }
+    @Transactional(readOnly = true)
+    public Optional<ConversationDTO> findOneByPublicIdAndProfileId(UUID publicId, Long profileId) {
+        log.debug("Request to get Conversation by public id : {}", publicId);
+        return conversationRepository.findOneByPublicIdAndProfileId(publicId, profileId).map(conversationMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ConversationDTO> findAllForConnectedUser(Pageable pageable) throws UsernameNotFoundException {
+        ProfileDTO profileConnectedUser = connectedUserService.getProfileConnectedUser();
+        log.debug("Request to get Conversations connected user (profile id : {})", profileConnectedUser.getId());
+        return conversationRepository.findAllByProfileId(profileConnectedUser.getId(), pageable)
+            .map(conversationMapper::toDto);
+    }
 }

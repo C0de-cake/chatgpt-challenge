@@ -1,6 +1,7 @@
 package fr.codecake.chatgptchallenge.web.rest;
 
 import fr.codecake.chatgptchallenge.repository.ConversationRepository;
+import fr.codecake.chatgptchallenge.security.AuthoritiesConstants;
 import fr.codecake.chatgptchallenge.service.ConversationService;
 import fr.codecake.chatgptchallenge.service.dto.ConversationDTO;
 import fr.codecake.chatgptchallenge.web.rest.errors.BadRequestAlertException;
@@ -17,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -54,6 +57,7 @@ public class ConversationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/conversations")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<ConversationDTO> createConversation(@RequestBody ConversationDTO conversationDTO) throws URISyntaxException {
         log.debug("REST request to save Conversation : {}", conversationDTO);
         if (conversationDTO.getId() != null) {
@@ -77,6 +81,7 @@ public class ConversationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/conversations/{id}")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<ConversationDTO> updateConversation(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody ConversationDTO conversationDTO
@@ -112,6 +117,7 @@ public class ConversationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/conversations/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<ConversationDTO> partialUpdateConversation(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody ConversationDTO conversationDTO
@@ -143,6 +149,7 @@ public class ConversationResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of conversations in body.
      */
     @GetMapping("/conversations")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<List<ConversationDTO>> getAllConversations(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         log.debug("REST request to get a page of Conversations");
         Page<ConversationDTO> page = conversationService.findAll(pageable);
@@ -157,6 +164,7 @@ public class ConversationResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the conversationDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/conversations/{id}")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<ConversationDTO> getConversation(@PathVariable Long id) {
         log.debug("REST request to get Conversation : {}", id);
         Optional<ConversationDTO> conversationDTO = conversationService.findOne(id);
@@ -170,6 +178,7 @@ public class ConversationResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/conversations/{id}")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> deleteConversation(@PathVariable Long id) {
         log.debug("REST request to delete Conversation : {}", id);
         conversationService.delete(id);
@@ -177,5 +186,23 @@ public class ConversationResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    /**
+     * {@code GET  /conversations} : get all the conversations.
+     *
+     * @param pageable the pagination information.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of conversations in body.
+     */
+    @GetMapping("/conversations/for-connected-user")
+    public ResponseEntity<List<ConversationDTO>> getAllConversationsByProfileId(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+        log.debug("REST request to get a page of Conversations");
+        try {
+            Page<ConversationDTO> page = conversationService.findAllForConnectedUser(pageable);
+            HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+            return ResponseEntity.ok().headers(headers).body(page.getContent());
+        } catch (UsernameNotFoundException unfe) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

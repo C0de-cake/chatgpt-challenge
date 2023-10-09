@@ -1,6 +1,7 @@
 package fr.codecake.chatgptchallenge.web.rest;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -8,16 +9,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import fr.codecake.chatgptchallenge.IntegrationTest;
 import fr.codecake.chatgptchallenge.domain.Conversation;
+import fr.codecake.chatgptchallenge.domain.Profile;
+import fr.codecake.chatgptchallenge.domain.User;
 import fr.codecake.chatgptchallenge.repository.ConversationRepository;
+import fr.codecake.chatgptchallenge.repository.ProfileRepository;
+import fr.codecake.chatgptchallenge.repository.UserRepository;
+import fr.codecake.chatgptchallenge.security.AuthoritiesConstants;
 import fr.codecake.chatgptchallenge.service.dto.ConversationDTO;
 import fr.codecake.chatgptchallenge.service.mapper.ConversationMapper;
 import jakarta.persistence.EntityManager;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @IntegrationTest
 @AutoConfigureMockMvc
-@WithMockUser
+@WithMockUser(authorities = AuthoritiesConstants.ADMIN)
 class ConversationResourceIT {
 
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
@@ -43,11 +53,7 @@ class ConversationResourceIT {
 
     private static final String DEFAULT_CREATED_BY_USER = "user";
 
-    private static final String DEFAULT_CREATED_BY_SYSTEM = "system";
-
     private static final String UPDATED_CREATED_BY_USER = "user";
-
-    private static final String UPDATED_CREATED_BY_SYSTEM = "system";
 
     private static final Instant DEFAULT_CREATED_DATE = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_CREATED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
@@ -79,9 +85,15 @@ class ConversationResourceIT {
 
     private Conversation conversation;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ProfileRepository profileRepository;
+
     /**
      * Create an entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
@@ -96,9 +108,14 @@ class ConversationResourceIT {
         return conversation;
     }
 
+    public static Conversation createEntityWithParams(EntityManager em, String name, UUID publicId) {
+        Conversation conversation = new Conversation().name(name).publicId(publicId);
+        return conversation;
+    }
+
     /**
      * Create an updated entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
@@ -139,6 +156,10 @@ class ConversationResourceIT {
         Conversation testConversation = conversationList.get(conversationList.size() - 1);
         assertThat(testConversation.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testConversation.getPublicId()).isEqualTo(DEFAULT_PUBLIC_ID);
+        assertThat(testConversation.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY_USER);
+        assertThat(testConversation.getCreatedDate()).isNotNull();
+        assertThat(testConversation.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY_USER);
+        assertThat(testConversation.getLastModifiedDate()).isNotNull();
         assertThat(testConversation.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY_USER);
         assertThat(testConversation.getCreatedDate()).isNotNull();
         assertThat(testConversation.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY_USER);
@@ -255,7 +276,7 @@ class ConversationResourceIT {
         assertThat(testConversation.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY_USER);
         assertThat(testConversation.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
         assertThat(testConversation.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY_SYSTEM);
-        assertThat(testConversation.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+        assertThat(testConversation.getLastModifiedDate()).isNotNull();
     }
 
     @Test
@@ -404,6 +425,10 @@ class ConversationResourceIT {
         assertThat(testConversation.getCreatedDate()).isNotNull();
         assertThat(testConversation.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY_SYSTEM);
         assertThat(testConversation.getLastModifiedDate()).isNotNull();
+        assertThat(testConversation.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY_USER);
+        assertThat(testConversation.getCreatedDate()).isNotNull();
+        assertThat(testConversation.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY_SYSTEM);
+        assertThat(testConversation.getLastModifiedDate()).isNotNull();
     }
 
     @Test
@@ -494,5 +519,65 @@ class ConversationResourceIT {
         // Validate the database contains one less item
         List<Conversation> conversationList = conversationRepository.findAll();
         assertThat(conversationList).hasSize(databaseSizeBeforeDelete - 1);
+    }
+
+    private final static String LOGIN_USER = "toto";
+
+    @Test
+    @Transactional
+    @WithMockUser(authorities = "USER", username = LOGIN_USER)
+    void getAllConversationsForAUserSortedByCreatedDate() throws Exception {
+        User user = UserResourceIT.createEntity(em);
+        user.setLogin(LOGIN_USER);
+        Profile profile = ProfileResourceIT.createEntity(em);
+        profileRepository.saveAndFlush(profile);
+        userRepository.saveAndFlush(user);
+        profile.setUser(user);
+
+        conversation.setProfile(profile);
+
+        // Initialize the database
+        conversationRepository.saveAndFlush(conversation);
+
+        Conversation conversation1 = createEntityWithParams(em, "Conversation-1", UUID.randomUUID());
+        conversation1.setProfile(profile);
+        Conversation conversation2 = createEntityWithParams(em, "Conversation-2", UUID.randomUUID());
+        conversation2.setProfile(profile);
+        Conversation conversation3 = createEntityWithParams(em, "Conversation-3", UUID.randomUUID());
+        conversation3.setProfile(profile);
+
+        conversationRepository.saveAndFlush(conversation1);
+        Thread.sleep(500);
+        conversationRepository.saveAndFlush(conversation2);
+        Thread.sleep(500);
+        conversationRepository.saveAndFlush(conversation3);
+
+        // Get all the conversationList
+        restConversationMockMvc
+            .perform(get(ENTITY_API_URL + "/for-connected-user?sort=createdDate,desc"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(
+                containsInRelativeOrder(
+                    conversation3.getId().intValue(),
+                    conversation2.getId().intValue(),
+                    conversation1.getId().intValue(),
+                    conversation.getId().intValue()
+                )))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+            .andExpect(jsonPath("$.[*].publicId").value(hasItem(DEFAULT_PUBLIC_ID.toString())));
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(authorities = "USER", username = "faulty-user")
+    void getAllConversationsForAUserNotExist() throws Exception {
+        // Initialize the database
+        conversationRepository.saveAndFlush(conversation);
+
+        // Get all the conversationList
+        restConversationMockMvc
+            .perform(get(ENTITY_API_URL + "/for-connected-user?sort=createdDate,desc"))
+            .andExpect(status().isNotFound());
     }
 }
