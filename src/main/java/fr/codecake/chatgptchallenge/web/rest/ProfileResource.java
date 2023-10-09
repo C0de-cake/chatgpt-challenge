@@ -186,4 +186,18 @@ public class ProfileResource {
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
+
+    /**
+     * {@code GET  /profiles/:id} : get the "id" profile.
+     *
+     * @param login the login of the profileDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the profileDTO, or with status {@code 404 (Not Found)}.
+     */
+    @GetMapping("/profiles-by-login/{login}")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public ResponseEntity<ProfileDTO> getProfileByUserLogin(@PathVariable String login) {
+        log.debug("REST request to get Profile by login : {}", login);
+        Optional<ProfileDTO> profileDTO = profileService.findOneByUserEmail(login);
+        return ResponseUtil.wrapOrNotFound(profileDTO);
+    }
 }

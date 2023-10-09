@@ -12,27 +12,27 @@
       <div id="intermediate-container-list">
         <div *ngFor="let conversationsByMonth of conversationsByMonths| keyvalue">
           <div class="month">{{conversationsByMonth.key}}</div>
-          <button *ngFor="let conversation of conversationsByMonth.value; trackBy: trackId "
+          <button [attr.data-cy]="'conversation-' + index" *ngFor="let conversation of conversationsByMonth.value; trackBy: trackId; index as index;"
                   class="btn btn-dark my-1 w-100 text-start d-flex align-items-center">
             <fa-icon icon="message" class="pe-3"></fa-icon>
             <div class="btn-conversation d-flex align-items-center justify-content-between flex-grow-1">
               <div class="btn-conversation" (click)="onSelect(conversation)">
-                <span *ngIf="!isConversationInEditMode(conversation.id)">{{conversation.name}}</span>
+                <span *ngIf="!isConversationInEditMode(conversation.id)" data-cy="name">{{conversation.name}}</span>
               </div>
               <div class="d-flex flex-row justify-content-end align-items-center actions"
                    *ngIf="isConversationSelectedNotInEditMode(conversation.id)">
-                <fa-icon icon="pen" (click)="onClickRename()" class="pe-2"></fa-icon>
-                <fa-icon icon="trash" (click)="onDelete(conversation.publicId)"></fa-icon>
+                <fa-icon data-cy="rename" icon="pen" (click)="onClickRename()" class="pe-2"></fa-icon>
+                <fa-icon icon="trash" data-cy="delete" (click)="onDelete(conversation.publicId)"></fa-icon>
               </div>
             </div>
             <div class="d-flex justify-content-around" *ngIf="isConversationInEditMode(conversation.id)">
               <form #convForm="ngForm" class="pe-2">
                 <input class="form-control input-name" type="text"
-                       [(ngModel)]="conversation.name" name="name"/>
+                       [(ngModel)]="conversation.name" name="name" data-cy="rename-input"/>
               </form>
               <div class="d-flex flex-row justify-content-end align-items-center actions">
-                <fa-icon icon="check" (click)="onValidateRename(conversation)" class="pe-2"></fa-icon>
-                <fa-icon icon="xmark" (click)="onCancelRename()"></fa-icon>
+                <fa-icon icon="check" data-cy="validate-rename" (click)="onValidateRename(conversation)" class="pe-2"></fa-icon>
+                <fa-icon icon="xmark" data-cy="cancel-rename" (click)="onCancelRename()"></fa-icon>
               </div>
             </div>
           </button>

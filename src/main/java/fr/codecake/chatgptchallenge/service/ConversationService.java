@@ -178,4 +178,23 @@ public class ConversationService {
         return conversationRepository.findAllByProfileId(profileConnectedUser.getId(), pageable)
             .map(conversationMapper::toDto);
     }
+
+    /**
+     * Save a conversation.
+     *
+     * @param conversationDTO the entity to save.
+     * @return the persisted entity.
+     */
+    public ConversationDTO saveForConnectedUser(ConversationDTO conversationDTO) {
+        ProfileDTO profileConnectedUser = connectedUserService.getProfileConnectedUser();
+        conversationDTO.setProfile(profileConnectedUser);
+
+        log.debug("Request to save Conversation : {}", conversationDTO);
+        if (conversationDTO.getPublicId() == null) {
+            conversationDTO.setPublicId(UUID.randomUUID());
+        }
+        Conversation conversation = conversationMapper.toEntity(conversationDTO);
+        conversation = conversationRepository.save(conversation);
+        return conversationMapper.toDto(conversation);
+    }
 }

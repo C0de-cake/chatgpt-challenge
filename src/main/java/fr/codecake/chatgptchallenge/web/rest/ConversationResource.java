@@ -5,6 +5,7 @@ import fr.codecake.chatgptchallenge.security.AuthoritiesConstants;
 import fr.codecake.chatgptchallenge.security.SecurityUtils;
 import fr.codecake.chatgptchallenge.service.ConversationService;
 import fr.codecake.chatgptchallenge.service.dto.ConversationDTO;
+import fr.codecake.chatgptchallenge.service.dto.ProfileDTO;
 import fr.codecake.chatgptchallenge.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -258,5 +259,27 @@ public class ConversationResource {
 
         conversationService.deleteByPublicId(publicId, currentLogin);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * {@code POST  /conversations} : Create a new conversation.
+     *
+     * @param conversationDTO the conversationDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new conversationDTO, or with status {@code 400 (Bad Request)} if the conversation has already an ID.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PostMapping("/conversations/create")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public ResponseEntity<ConversationDTO> createConversationForConnectedUser(@RequestBody ConversationDTO conversationDTO) throws URISyntaxException {
+        log.debug("REST request to save Conversation : {}", conversationDTO);
+        if (conversationDTO.getId() != null) {
+            throw new BadRequestAlertException("A new conversation cannot already have an ID", ENTITY_NAME, "idexists");
+        }
+
+        ConversationDTO result = conversationService.saveForConnectedUser(conversationDTO);
+        return ResponseEntity
+            .created(new URI("/api/conversations/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 }
