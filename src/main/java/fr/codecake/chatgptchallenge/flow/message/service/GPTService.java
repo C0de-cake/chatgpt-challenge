@@ -6,6 +6,7 @@ import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.enums.GPTRole;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.query.GPTConversationQueryDTO;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.query.GPTMessageQueryDTO;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTChatCompResponseDTO;
+import fr.codecake.chatgptchallenge.flow.message.service.exception.OpenAIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static java.lang.String.format;
 
 @Service
 public class GPTService {
@@ -47,10 +50,14 @@ public class GPTService {
         gptConversationDTO.setMaxTokens(1000);
         gptConversationDTO.setUser(UUID.randomUUID().toString());
 
-        return callAPI(gptConversationDTO);
+        try {
+            return callAPI(gptConversationDTO);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
-    public Optional<GPTChatCompResponseDTO> callAPI(GPTConversationQueryDTO gptConversationDTO) {
+    public Optional<GPTChatCompResponseDTO> callAPI(GPTConversationQueryDTO gptConversationDTO) throws OpenAIException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(openAIKey);
@@ -64,7 +71,8 @@ public class GPTService {
         if (response.getStatusCode().is2xxSuccessful()) {
             return Optional.ofNullable(response.getBody());
         } else {
-            return Optional.empty();
+            throw new OpenAIException(format("Something went wrong when calling OpenAI API %s"
+                , gptConversationDTO.toString()));
         }
     }
 }
