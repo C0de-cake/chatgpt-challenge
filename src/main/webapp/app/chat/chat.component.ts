@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {ConversationService} from "../entities/conversation/service/conversation.service";
 import {IConversation, IConversationWithMessages} from "../entities/conversation/conversation.model";
-import {map} from "rxjs/operators";
+import {filter, map} from "rxjs/operators";
 import {Alert, AlertService} from "../core/util/alert.service";
 import {HttpErrorResponse, HttpResponse} from "@angular/common/http";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {ChatService, EntityResponseType} from "./chat.service";
 import {FlowMessageQueryDTO, FlowMessageResponseDTO} from "./flow-message.model";
 import {IMessage} from "../entities/message/message.model";
@@ -31,11 +31,13 @@ export class ChatComponent implements OnInit {
   constructor(private conversationService: ConversationService,
               private alertService: AlertService,
               private router: Router,
+              private activatedRoute: ActivatedRoute,
               private charService: ChatService) {
   }
 
   ngOnInit(): void {
     this.fetchConversations();
+
   }
 
   onSelect(conversation: IConversation): void {
@@ -165,6 +167,7 @@ export class ChatComponent implements OnInit {
       )
       .subscribe(conversations => {
         this.handleFetchConversationSuccess(conversations);
+        this.loadConversationInURL(conversations);
       });
   }
 
@@ -183,6 +186,21 @@ export class ChatComponent implements OnInit {
           }
         }
       }
+    }
+  }
+
+  private loadConversationInURL(conversations: IConversationWithMessages[] | null): void {
+    if (conversations !== null) {
+      this.activatedRoute.queryParamMap.pipe(
+        filter(params => params.has('id')),
+        map(params => params.get('id'))
+      ).subscribe(id => {
+        const iConversationWithMessages =
+          conversations.filter(conv => conv.publicId === id);
+        if (iConversationWithMessages.length !== 0) {
+          this.conversationSelected = iConversationWithMessages[0]
+        }
+      });
     }
   }
 
