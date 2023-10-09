@@ -21,3 +21,8 @@
 .form-control {
   color: $white;
 }
+
+#send-message-text-area {
+  max-height: 200px;
+  height: 40px;
+}

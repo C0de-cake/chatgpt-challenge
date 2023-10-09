@@ -8,10 +8,10 @@
     <div class="col-6">
       <form #messageForm="ngForm">
         <div class="input-group mb-3 mt-3">
-          <input [disabled]="loading" type="text" class="form-control" [(ngModel)]="message"
+          <textarea id="send-message-text-area" [disabled]="loading" type="text" class="form-control" [(ngModel)]="message"
                  placeholder="Send a message"
                  aria-label="Message to GPT" data-cy="input-to-gpt" name="message"
-                 aria-describedby="button-send-to-gpt">
+                    aria-describedby="button-send-to-gpt" (keydown.enter)="onSendMessage()"></textarea>
           <button [disabled]="loading || message == ''" (click)="onSendMessage()" data-cy="button-send-to-gpt" class="btn btn-primary"
                   type="button" id="send">
             <fa-icon *ngIf="!loading" id="send-icon" icon="paper-plane"></fa-icon>
