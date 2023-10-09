@@ -1,6 +1,9 @@
-package fr.codecake.chatgptchallenge.service.dto;
+package fr.codecake.chatgptchallenge.flow.message.dto;
+
+import fr.codecake.chatgptchallenge.service.dto.MessageDTO;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -8,14 +11,13 @@ import java.util.Objects;
  * A DTO for the {@link fr.codecake.chatgptchallenge.domain.Conversation} entity.
  */
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class ConversationDTO implements Serializable {
+public class ConversationFlowDTO implements Serializable {
 
     private Long id;
 
     private String name;
 
-    private List<MessageDTO> messages;
-
+    private List<MessageFlowDTO> messages = new ArrayList<>();
     public Long getId() {
         return id;
     }
@@ -32,11 +34,11 @@ public class ConversationDTO implements Serializable {
         this.name = name;
     }
 
-    public List<MessageDTO> getMessages() {
+    public List<MessageFlowDTO> getMessages() {
         return messages;
     }
 
-    public void setMessages(List<MessageDTO> messages) {
+    public void setMessages(List<MessageFlowDTO> messages) {
         this.messages = messages;
     }
 
@@ -45,11 +47,11 @@ public class ConversationDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ConversationDTO)) {
+        if (!(o instanceof ConversationFlowDTO)) {
             return false;
         }
 
-        ConversationDTO conversationDTO = (ConversationDTO) o;
+        ConversationFlowDTO conversationDTO = (ConversationFlowDTO) o;
         if (this.id == null) {
             return false;
         }

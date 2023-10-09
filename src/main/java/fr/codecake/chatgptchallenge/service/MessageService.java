@@ -4,7 +4,12 @@ import fr.codecake.chatgptchallenge.domain.Message;
 import fr.codecake.chatgptchallenge.repository.MessageRepository;
 import fr.codecake.chatgptchallenge.service.dto.MessageDTO;
 import fr.codecake.chatgptchallenge.service.mapper.MessageMapper;
+
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -108,5 +113,20 @@ public class MessageService {
     public void delete(Long id) {
         log.debug("Request to delete Message : {}", id);
         messageRepository.deleteById(id);
+    }
+
+    public List<MessageDTO> saveAll(List<MessageDTO> messagesDTO) {
+        log.debug("Request to save list of messages : {}", messagesDTO);
+        Set<Message> messagesToPersist = messagesDTO
+            .stream()
+            .map(messageMapper::toEntity)
+            .collect(Collectors.toSet());
+
+        List<Message> messages = messageRepository.saveAll(messagesToPersist);
+
+        return messages
+            .stream()
+            .map(messageMapper::toDto)
+            .collect(Collectors.toList());
     }
 }

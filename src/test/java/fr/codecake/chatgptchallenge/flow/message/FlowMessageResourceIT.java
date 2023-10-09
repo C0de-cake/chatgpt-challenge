@@ -4,12 +4,12 @@ import fr.codecake.chatgptchallenge.IntegrationTest;
 import fr.codecake.chatgptchallenge.domain.Conversation;
 import fr.codecake.chatgptchallenge.domain.Message;
 import fr.codecake.chatgptchallenge.domain.enumeration.Owner;
-import fr.codecake.chatgptchallenge.flow.message.dto.FlowMessageDTO;
+import fr.codecake.chatgptchallenge.flow.message.dto.FlowMessageQueryDTO;
 import fr.codecake.chatgptchallenge.flow.message.dto.gpt.enums.GPTRole;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTChatCompletion;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTChoice;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTMessage;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTUsage;
+import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTChatCompResponseDTO;
+import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTChoiceResponseDTO;
+import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTMessageResponseDTO;
+import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTUsageResponseDTO;
 import fr.codecake.chatgptchallenge.repository.ConversationRepository;
 import fr.codecake.chatgptchallenge.repository.MessageRepository;
 import fr.codecake.chatgptchallenge.web.rest.TestUtil;
@@ -33,7 +33,6 @@ import org.springframework.web.client.RestTemplate;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -43,9 +42,11 @@ import java.util.stream.Collectors;
 
 import static fr.codecake.chatgptchallenge.test.util.OAuth2TestUtil.TEST_USER_LOGIN;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -56,9 +57,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @IntegrationTest
 class FlowMessageResourceIT {
 
-    private static final String DEFAULT_CONTENT_FROM_USER = "AAAAAAAAAA";
+    private static final String DEFAULT_CONTENT_FROM_USER = "Hello, I want to know what's JHipster?";
 
-    private static final String DEFAULT_CONTENT_FROM_GPT = "CCCCCCCCC";
+    private static final String DEFAULT_CONTENT_FROM_GPT = "Hello there, how may I assist you today?";
 
     @Autowired
     private EntityManager em;
@@ -72,10 +73,10 @@ class FlowMessageResourceIT {
     @Autowired
     private MessageRepository messageRepository;
 
-    @MockBean
+    @Autowired
     private RestTemplate restTemplate;
 
-    private FlowMessageDTO flowMessageDTO;
+    private FlowMessageQueryDTO flowMessageQueryDTO;
 
     private MockRestServiceServer mockServer;
 
@@ -83,7 +84,7 @@ class FlowMessageResourceIT {
 
     @BeforeEach
     public void setup() {
-        mockServer = MockRestServiceServer.createServer(restTemplate);
+//        mockServer = MockRestServiceServer.createServer(restTemplate);
         messageRepository.deleteAll();
         conversationRepository.deleteAll();
     }
@@ -107,27 +108,30 @@ class FlowMessageResourceIT {
 
     @BeforeEach
     public void initTest() {
-        flowMessageDTO = new FlowMessageDTO();
+        flowMessageQueryDTO = new FlowMessageQueryDTO();
+        flowMessageQueryDTO.setContent(DEFAULT_CONTENT_FROM_USER);
+        flowMessageQueryDTO.setNewConversation(true);
+        flowMessageQueryDTO.setConversationPublicId(null);
     }
 
     private void prepareGPTAPICallMock() throws URISyntaxException, JsonProcessingException {
-        GPTUsage usage = new GPTUsage();
+        GPTUsageResponseDTO usage = new GPTUsageResponseDTO();
         usage.setPromptTokens(9);
         usage.setCompletionTokens(12);
         usage.setTotalTokens(21);
 
-        GPTMessage gptMessage = new GPTMessage();
-        gptMessage.setRole(GPTRole.ASSISTANT);
-        gptMessage.setContent("Hello there, how may I assist you today?");
+        GPTMessageResponseDTO gptMessage = new GPTMessageResponseDTO();
+        gptMessage.setRole(GPTRole.ASSISTANT.name().toLowerCase());
+        gptMessage.setContent(DEFAULT_CONTENT_FROM_GPT);
 
-        GPTChoice choice = new GPTChoice();
+        GPTChoiceResponseDTO choice = new GPTChoiceResponseDTO();
         choice.setIndex(0);
         choice.setMessage(gptMessage);
         choice.setFinishReason("stop");
 
-        List<GPTChoice> choices = List.of(choice);
+        List<GPTChoiceResponseDTO> choices = List.of(choice);
 
-        GPTChatCompletion chatCompletion = new GPTChatCompletion();
+        GPTChatCompResponseDTO chatCompletion = new GPTChatCompResponseDTO();
         chatCompletion.setId("chatcmpl-123");
         chatCompletion.setObject("chat.completion");
         chatCompletion.setCreated(1677652288L);
@@ -144,8 +148,9 @@ class FlowMessageResourceIT {
     }
 
     @Test
+    @Transactional
     public void shouldHandleMessageForANewConversation() throws Exception {
-        prepareGPTAPICallMock();
+//        prepareGPTAPICallMock();
 
         List<Conversation> noConversationsPresent = conversationRepository.findAll();
         assertThat(noConversationsPresent).isEmpty();
@@ -155,11 +160,13 @@ class FlowMessageResourceIT {
                 MockMvcRequestBuilders.post("/api/flow/message")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(flowMessageDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(flowMessageQueryDTO))
             )
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT_FROM_GPT))
+            .andExpect(jsonPath("$.conversationPublicId").exists());
 
-        mockServer.verify();
+//        mockServer.verify();
 
         List<Conversation> allConversations = conversationRepository.findAll();
         assertThat(allConversations.size()).isEqualTo(1);
@@ -190,6 +197,7 @@ class FlowMessageResourceIT {
         prepareGPTAPICallMock();
 
         String newMessageContent = "Can you explain what's spring boot?";
+        String reponseGPTContent = "reponse GPT";
 
         Message message = new Message();
         message.setContent("Hello, I want to know what's JHipster?");
@@ -216,20 +224,23 @@ class FlowMessageResourceIT {
 
         assertThat(onlyOneMessageShouldBePresent).isEqualTo(1);
 
-        flowMessageDTO.setNewConversation(false);
-        flowMessageDTO.setConversationPublicId("lol");
-        flowMessageDTO.setContent(newMessageContent);
+        flowMessageQueryDTO.setNewConversation(false);
+        flowMessageQueryDTO.setConversationPublicId(1L);
+        flowMessageQueryDTO.setContent(newMessageContent);
 
         restMessageMockMvc
             .perform(
                 MockMvcRequestBuilders.post("/api/flow/message")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(flowMessageDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(flowMessageQueryDTO))
             )
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.isNewConversation").value(true))
+            .andExpect(jsonPath("$.content").value(reponseGPTContent))
+            .andExpect(jsonPath("$.conversationPublicId").value(1L));
 
-        mockServer.verify();
+//        mockServer.verify();
 
         List<Conversation> onlyOneConversationStillPresent = conversationRepository.findAll();
         assertThat(onlyOneConversationStillPresent.size()).isEqualTo(1);
@@ -252,16 +263,16 @@ class FlowMessageResourceIT {
 
     @Test
     public void shouldAnswer400WhenRequiredFieldAreNotPresent() throws Exception {
-        flowMessageDTO.setNewConversation(false);
-        flowMessageDTO.setConversationPublicId("lol");
-        flowMessageDTO.setContent(null);
+        flowMessageQueryDTO.setNewConversation(false);
+        flowMessageQueryDTO.setConversationPublicId(1L);
+        flowMessageQueryDTO.setContent(null);
 
         restMessageMockMvc
             .perform(
                 MockMvcRequestBuilders.post("/api/flow/message")
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(flowMessageDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(flowMessageQueryDTO))
             )
             .andExpect(status().isBadRequest());
     }

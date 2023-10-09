@@ -1,10 +1,13 @@
 package fr.codecake.chatgptchallenge.service;
 
 import fr.codecake.chatgptchallenge.domain.Conversation;
+import fr.codecake.chatgptchallenge.flow.message.dto.ConversationFlowDTO;
 import fr.codecake.chatgptchallenge.repository.ConversationRepository;
 import fr.codecake.chatgptchallenge.service.dto.ConversationDTO;
 import fr.codecake.chatgptchallenge.service.mapper.ConversationMapper;
+
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -24,10 +27,14 @@ public class ConversationService {
     private final ConversationRepository conversationRepository;
 
     private final ConversationMapper conversationMapper;
+    private final MessageService messageService;
 
-    public ConversationService(ConversationRepository conversationRepository, ConversationMapper conversationMapper) {
+    public ConversationService(ConversationRepository conversationRepository,
+                               ConversationMapper conversationMapper,
+                               MessageService messageService) {
         this.conversationRepository = conversationRepository;
         this.conversationMapper = conversationMapper;
+        this.messageService = messageService;
     }
 
     /**
@@ -108,5 +115,13 @@ public class ConversationService {
     public void delete(Long id) {
         log.debug("Request to delete Conversation : {}", id);
         conversationRepository.deleteById(id);
+    }
+
+    @Transactional
+    public ConversationDTO saveWithMessages(ConversationDTO conversationDTO) {
+        Conversation conversationToSave = conversationMapper.toEntityWithMessages(conversationDTO);
+        conversationToSave = conversationRepository.save(conversationToSave);
+        messageService.saveAll(conversationDTO.getMessages());
+        return conversationMapper.toDto(conversationToSave);
     }
 }

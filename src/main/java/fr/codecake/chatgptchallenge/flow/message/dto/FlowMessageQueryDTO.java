@@ -4,15 +4,15 @@ import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
 
-public class FlowMessageDTO implements Serializable {
+public class FlowMessageQueryDTO implements Serializable {
 
     @NotNull
-    public String content;
+    private String content;
 
     @NotNull
-    public Boolean isNewConversation;
+    private Boolean isNewConversation;
 
-    public String conversationPublicId;
+    private Long conversationPublicId;
 
     public String getContent() {
         return content;
@@ -30,11 +30,11 @@ public class FlowMessageDTO implements Serializable {
         isNewConversation = newConversation;
     }
 
-    public String getConversationPublicId() {
+    public Long getConversationPublicId() {
         return conversationPublicId;
     }
 
-    public void setConversationPublicId(String conversationPublicId) {
+    public void setConversationPublicId(Long conversationPublicId) {
         this.conversationPublicId = conversationPublicId;
     }
 }
