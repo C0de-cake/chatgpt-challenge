@@ -157,7 +157,7 @@ export class ChatComponent implements OnInit {
   private fetchConversations(): void {
     const queryObject: any = {
       page: 0,
-      size: 30,
+      size: 100,
       sort: ['createdDate,desc']
     };
 
@@ -217,7 +217,7 @@ export class ChatComponent implements OnInit {
   private onMessageSuccess(res: EntityResponseType, messageContentFromUser: string): void {
     this.loadingMessage = false;
     const flowMessageResponse = res.body;
-
+    console.dir(flowMessageResponse);
     if (flowMessageResponse?.conversation) {
       this.mapNewConversationAndMessagesFromAPI(flowMessageResponse, messageContentFromUser);
       this.putNewConversationInCurrentMonth();
@@ -230,6 +230,7 @@ export class ChatComponent implements OnInit {
   private putMessageInExistingConversation(flowMessageResponse: FlowMessageResponseDTO | null, messageContentFromUser: string): void {
     for (const conversationsEntry of this.conversationsByMonths.entries()) {
       for (const conversation of conversationsEntry[1]) {
+        console.dir(flowMessageResponse?.conversationPublicId);
         if (conversation.publicId === flowMessageResponse?.conversationPublicId) {
           if (flowMessageResponse && this.conversationSelected.messages) {
             const messageGPT: IMessage = {id: 1, content: flowMessageResponse.content, owner: "GPT"};
@@ -246,7 +247,6 @@ export class ChatComponent implements OnInit {
     const currentMonth = dayjs().format('MMMM');
     if (this.conversationsByMonths.has(currentMonth)) {
       this.conversationsByMonths.get(currentMonth)?.unshift(cloneDeep(this.conversationSelected));
-
     } else {
       const conversationsSpecificMonth = new Array<IConversation>();
       conversationsSpecificMonth.push(cloneDeep(this.conversationSelected));
