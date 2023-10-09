@@ -6,6 +6,7 @@ import {FormsModule} from "@angular/forms";
 import { ThreadComponent } from './thread/thread.component';
 import {InteractionComponent} from "./thread/interaction/interaction.component";
 import {MarkdownModule} from "ngx-markdown";
+import {NgPipesModule} from "ngx-pipes";
 
 
 
@@ -15,7 +16,8 @@ import {MarkdownModule} from "ngx-markdown";
     CommonModule,
     SharedModule,
     FormsModule,
-    MarkdownModule
+    MarkdownModule,
+    NgPipesModule
   ]
 })
 export class ChatModule { }

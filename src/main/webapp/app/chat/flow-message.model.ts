@@ -1,3 +1,6 @@
+import {Dayjs} from "dayjs";
+import {IConversation} from "../entities/conversation/conversation.model";
+
 export interface FlowMessageQueryDTO {
   content?: string | null;
   newConversation?: boolean | null;
@@ -7,10 +10,11 @@ export interface FlowMessageQueryDTO {
 export interface FlowMessageResponseDTO {
   content?: string | null;
   conversationPublicId?: string | null;
-  conversation: FlowConversationDTO | null;
+  conversation?: IConversation | null;
 }
 
 export interface FlowConversationDTO {
   name?: string | null;
   publicId?: string | null;
+  createdDate?: Dayjs | null;
 }

@@ -9,7 +9,8 @@ import {ChatService, EntityResponseType} from "./chat.service";
 import {FlowMessageQueryDTO, FlowMessageResponseDTO} from "./flow-message.model";
 import {IMessage} from "../entities/message/message.model";
 import dayjs from "dayjs/esm";
-import { cloneDeep } from 'lodash-es';
+import {cloneDeep} from 'lodash-es';
+import {KeyValue} from "@angular/common";
 
 @Component({
   selector: 'jhi-chat',
@@ -77,16 +78,23 @@ export class ChatComponent implements OnInit {
       });
   }
 
-  isConversationSelectedNotInEditMode(id: number): boolean {
-    return this.conversationSelected.id === id && !this.isEditMode;
+  isConversationSelectedNotInEditMode(publicId: string | null | undefined): boolean {
+    return this.conversationSelected.publicId === publicId && !this.isEditMode;
   }
 
-  isConversationInEditMode(id: number): boolean {
-    return this.conversationSelected.id === id && this.isEditMode;
+  isConversationInEditMode(publicId: string | null | undefined): boolean {
+    return this.conversationSelected.publicId === publicId && this.isEditMode;
   }
 
   trackId = (publicId: number, item: IConversation): string => this.conversationService.getConversationPublicIdentifier(item);
 
+  sortByMonth = (a: KeyValue<string, IConversation[]>, b: KeyValue<string, IConversation[]>): number =>
+    dayjs(b.key, 'MMMM').toDate().getTime() - dayjs(a.key, 'MMMM').toDate().getTime();
+
+  onNewConversation(): void {
+    this.conversationSelected = {id: 0};
+    this.router.navigate(['chat']);
+  }
 
   onSendMessage(newMessage: string): void {
     this.loadingMessage = true;
@@ -195,6 +203,7 @@ export class ChatComponent implements OnInit {
     if (flowMessageResponse?.conversation) {
       this.mapNewConversationAndMessagesFromAPI(flowMessageResponse, messageContentFromUser);
       this.putNewConversationInCurrentMonth();
+      this.onSelect(flowMessageResponse.conversation as IConversationWithMessages)
     } else {
       this.putMessageInExistingConversation(flowMessageResponse, messageContentFromUser);
     }
@@ -218,7 +227,8 @@ export class ChatComponent implements OnInit {
   private putNewConversationInCurrentMonth(): void {
     const currentMonth = dayjs().format('MMMM');
     if (this.conversationsByMonths.has(currentMonth)) {
-      this.conversationsByMonths.get(currentMonth)?.push(cloneDeep(this.conversationSelected));
+      this.conversationsByMonths.get(currentMonth)?.unshift(cloneDeep(this.conversationSelected));
+
     } else {
       const conversationsSpecificMonth = new Array<IConversation>();
       conversationsSpecificMonth.push(cloneDeep(this.conversationSelected));
@@ -227,7 +237,7 @@ export class ChatComponent implements OnInit {
   }
 
   private mapNewConversationAndMessagesFromAPI(flowMessageResponse: FlowMessageResponseDTO,
-                                            messageContentFromUser: string): void {
+                                               messageContentFromUser: string): void {
     this.conversationSelected = flowMessageResponse.conversation as IConversationWithMessages;
     this.conversationSelected.messages = new Array<IMessage>();
     const messageUser: IMessage = {id: 0, content: messageContentFromUser, owner: "USER"}

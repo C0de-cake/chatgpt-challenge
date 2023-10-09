@@ -3,32 +3,32 @@
 <div class="d-flex" id="conversations">
   <div class="px-0" id="controls">
     <div class="pe-2 pt-3 ps-2">
-      <div class="btn btn-primary w-100 text-start">
+      <button class="btn btn-primary w-100 text-start" (click)="onNewConversation()">
         <fa-icon icon="plus" class="pe-2"></fa-icon>
         <span>New conversation</span>
-      </div>
+      </button>
     </div>
     <div class="d-flex flex-column justify-content-start align-items-start mt-3" id="list">
       <div id="intermediate-container-list">
-        <div *ngFor="let conversationsByMonth of conversationsByMonths| keyvalue">
+        <div *ngFor="let conversationsByMonth of conversationsByMonths| keyvalue: sortByMonth">
           <div class="month">{{conversationsByMonth.key}}</div>
-          <button [class.active-conversation]="conversationSelected.id == conversation.id"
+          <button [class.active-conversation]="conversationSelected.publicId == conversation.publicId"
                   [attr.data-cy]="'conversation-' + index"
-                  *ngFor="let conversation of conversationsByMonth.value;
+                  *ngFor="let conversation of conversationsByMonth.value | orderByImpure: '-createdDate';
                    trackBy: trackId; index as index;"
                   class="btn btn-dark my-1 w-100 text-start d-flex align-items-center">
             <fa-icon icon="message" class="pe-3"></fa-icon>
             <div class="btn-conversation d-flex align-items-center justify-content-between flex-grow-1">
               <div class="btn-conversation" (click)="onSelect(conversation)">
-                <span *ngIf="!isConversationInEditMode(conversation.id)" data-cy="name">{{conversation.name}}</span>
+                <span *ngIf="!isConversationInEditMode(conversation.publicId)" data-cy="name">{{conversation.name}}</span>
               </div>
               <div class="d-flex flex-row justify-content-end align-items-center actions"
-                   *ngIf="isConversationSelectedNotInEditMode(conversation.id)">
+                   *ngIf="isConversationSelectedNotInEditMode(conversation.publicId)">
                 <fa-icon data-cy="rename" icon="pen" (click)="onClickRename()" class="pe-2"></fa-icon>
                 <fa-icon icon="trash" data-cy="delete" (click)="onDelete(conversation.publicId)"></fa-icon>
               </div>
             </div>
-            <div class="d-flex justify-content-around" *ngIf="isConversationInEditMode(conversation.id)">
+            <div class="d-flex justify-content-around" *ngIf="isConversationInEditMode(conversation.publicId)">
               <form #convForm="ngForm" class="pe-2">
                 <input class="form-control input-name" type="text"
                        [(ngModel)]="conversation.name" name="name" data-cy="rename-input"/>

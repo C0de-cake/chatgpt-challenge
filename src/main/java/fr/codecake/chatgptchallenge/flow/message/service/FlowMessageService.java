@@ -92,6 +92,7 @@ public class FlowMessageService {
             FlowConversationDTO flowConversationDTO = new FlowConversationDTO();
             flowConversationDTO.setName(conversationDTO.getName());
             flowConversationDTO.setPublicId(conversationDTO.getPublicId());
+            flowConversationDTO.setCreatedDate(conversationDTO.getCreatedDate());
             flowMessageResponseDTO.setConversation(flowConversationDTO);
         } else {
             flowMessageResponseDTO.setConversationPublicId(conversationDTO.getPublicId());

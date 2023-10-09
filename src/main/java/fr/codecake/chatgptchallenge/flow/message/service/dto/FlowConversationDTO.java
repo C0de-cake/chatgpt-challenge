@@ -1,6 +1,7 @@
 package fr.codecake.chatgptchallenge.flow.message.service.dto;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 public class FlowConversationDTO implements Serializable {
@@ -8,6 +9,8 @@ public class FlowConversationDTO implements Serializable {
     private String name;
 
     private UUID publicId;
+
+    private Instant createdDate;
 
     public String getName() {
         return name;
@@ -23,5 +26,13 @@ public class FlowConversationDTO implements Serializable {
 
     public void setPublicId(UUID publicId) {
         this.publicId = publicId;
+    }
+
+    public Instant getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
     }
 }
