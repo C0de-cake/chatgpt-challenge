@@ -9,7 +9,7 @@
 // Color system
 //
 
-$white:    #fff !default;
+$white:    #ececf1;
 $gray-100: #f8f9fa !default;
 $gray-200: #ebebeb !default;
 $gray-300: #dee2e6 !default;
@@ -32,8 +32,8 @@ $green:   #00bc8c !default;
 $teal:    #20c997 !default;
 $cyan:    #3498db !default;
 
-$primary:       $blue !default;
-$secondary:     $gray-700 !default;
+$primary:       #4a4b54;
+$secondary:     #40414f;
 $success:       $green !default;
 $info:          $cyan !default;
 $warning:       $yellow !default;
@@ -45,7 +45,7 @@ $min-contrast-ratio:   1.9 !default;
 
 // Body
 
-$body-bg:                   $gray-900 !default;
+$body-bg:                   #202123;
 $body-color:                $white !default;
 
 // Links
@@ -60,3 +60,11 @@ $h1-font-size:                3rem !default;
 $h2-font-size:                2.5rem !default;
 $h3-font-size:                2rem !default;
 $text-muted:                  $gray-600 !default;
+
+$card-bg: $body-bg;
+
+$link-hover-color: #2a2b32;
+$btn-link-hover-color: #2a2b32;
+$dropdown-link-hover-bg: #2a2b32;
+
+$btn-active-bg: #343541;

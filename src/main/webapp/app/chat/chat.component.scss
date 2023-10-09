@@ -24,8 +24,22 @@
   text-overflow: ellipsis;
 }
 
+.btn-dark {
+  background-color: $body-bg;
+  border-color: $body-bg;
+}
+
+.btn-dark:hover {
+  background-color: $btn-link-hover-color;
+  border-color: $btn-link-hover-color;
+}
+
+.active-conversation {
+  background-color: $btn-active-bg;
+}
+
 #chat {
-  background-color: $gray-700;
+  background-color: #343640;
 }
 
 .month {
