@@ -1,4 +1,4 @@
-package fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.enums;
+package fr.codecake.chatgptchallenge.domain.enumeration;
 
 public enum GPTRole {
     SYSTEM("system"),

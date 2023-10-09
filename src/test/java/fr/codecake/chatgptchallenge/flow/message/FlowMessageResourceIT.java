@@ -8,7 +8,7 @@ import fr.codecake.chatgptchallenge.domain.User;
 import fr.codecake.chatgptchallenge.domain.enumeration.Owner;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.FlowMessageQueryDTO;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.enums.GPTModel;
-import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.enums.GPTRole;
+import fr.codecake.chatgptchallenge.domain.enumeration.GPTRole;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTChatCompResponseDTO;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTChoiceResponseDTO;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTMessageResponseDTO;

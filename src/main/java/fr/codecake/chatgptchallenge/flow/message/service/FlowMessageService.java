@@ -4,13 +4,14 @@ import fr.codecake.chatgptchallenge.domain.enumeration.Owner;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.FlowConversationDTO;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.FlowMessageQueryDTO;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.FlowMessageResponseDTO;
-import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.enums.GPTRole;
+import fr.codecake.chatgptchallenge.domain.enumeration.GPTRole;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTChatCompResponseDTO;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTChoiceResponseDTO;
 import fr.codecake.chatgptchallenge.flow.message.service.exception.ConversationNotExistException;
 import fr.codecake.chatgptchallenge.flow.message.service.exception.OpenAIException;
 import fr.codecake.chatgptchallenge.service.ConnectedUserService;
 import fr.codecake.chatgptchallenge.service.ConversationService;
+import fr.codecake.chatgptchallenge.service.MessageService;
 import fr.codecake.chatgptchallenge.service.dto.ConversationDTO;
 import fr.codecake.chatgptchallenge.service.dto.MessageDTO;
 import fr.codecake.chatgptchallenge.service.dto.ProfileDTO;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -29,13 +31,16 @@ public class FlowMessageService {
     private final GPTService gptService;
     private final ConversationService conversationService;
     private final ConnectedUserService connectedUserService;
+    private final MessageService messageService;
 
     public FlowMessageService(GPTService gptService,
                               ConversationService conversationService,
-                              ConnectedUserService connectedUserService) {
+                              ConnectedUserService connectedUserService,
+                              MessageService messageService) {
         this.gptService = gptService;
         this.conversationService = conversationService;
         this.connectedUserService = connectedUserService;
+        this.messageService = messageService;
     }
 
 
@@ -71,7 +76,10 @@ public class FlowMessageService {
             conversationDTO, Owner.USER);
 
         final Long conversationId = conversationDTO.getId();
-        GPTChatCompResponseDTO gptChatCompResponseDTO = gptService.sendMessage(flowMessageQueryDTO.getContent())
+
+        List<MessageDTO> allPreviousMessages = messageService.getAllMessagesByConversationId(conversationId);
+
+        GPTChatCompResponseDTO gptChatCompResponseDTO = gptService.sendMessage(flowMessageQueryDTO.getContent(), allPreviousMessages)
             .orElseThrow(() ->
                 new OpenAIException(format("Something went wrong when calling the GPT API" +
                     " for the conversation %s and the message %s", conversationId, flowMessageQueryDTO)));

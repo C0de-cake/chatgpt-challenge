@@ -7,6 +7,7 @@ import fr.codecake.chatgptchallenge.service.mapper.MessageMapper;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,6 +121,14 @@ public class MessageService {
         List<Message> messages = messageRepository.saveAllAndFlush(messagesToPersist);
 
         return messageMapper.toDtoWithConversation(messages);
+    }
+
+    public List<MessageDTO> getAllMessagesByConversationId(Long id) {
+        log.debug("Request to get list of messages by conversation id : {}", id);
+        return messageRepository.findAllByConversation_Id(id)
+            .stream()
+            .map(messageMapper::toDto)
+            .collect(Collectors.toList());
     }
 
     public List<Message> mapListToEntity(List<MessageDTO> messagesDTO) {

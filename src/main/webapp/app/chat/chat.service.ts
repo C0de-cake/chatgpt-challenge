@@ -34,19 +34,18 @@ export class ChatService {
         this.convertResponseFromServer(res)));
   }
 
-  protected convertDateFromServer(res: RestFlowMessageResponse | null): FlowMessageResponseDTO {
-    if(res !== null) {
-      const conversation: IConversation ={
-        id:0,
-        ...res.conversation,
-        createdDate: res.conversation?.createdDate ?
-          dayjs.unix(Number(res.conversation.createdDate)) : undefined,
-        lastModifiedDate: res.conversation?.lastModifiedDate ?
-          dayjs.unix(Number(res.conversation.createdDate)) : undefined,
+  protected convertDateFromServer(restFlowMessageResponse: RestFlowMessageResponse | null): FlowMessageResponseDTO {
+    if(restFlowMessageResponse?.conversation) {
+      const conversation: IConversation = {
+        ...restFlowMessageResponse.conversation,
+        createdDate: restFlowMessageResponse.conversation.createdDate ?
+          dayjs.unix(Number(restFlowMessageResponse.conversation.createdDate)) : undefined,
+        lastModifiedDate: restFlowMessageResponse.conversation.lastModifiedDate ?
+          dayjs.unix(Number(restFlowMessageResponse.conversation.createdDate)) : undefined,
       }
-      return {...res, conversation};
+      return {...restFlowMessageResponse, conversation};
     } else {
-      return {};
+      return {... restFlowMessageResponse} as FlowMessageResponseDTO;
     }
   }
 
