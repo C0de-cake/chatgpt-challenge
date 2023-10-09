@@ -17,7 +17,7 @@ export default defineConfig({
     async setupNodeEvents(on, config) {
       return (await import('./src/test/javascript/cypress/plugins/index')).default(on, config);
     },
-    baseUrl: 'http://localhost:9000/',
+    baseUrl: 'http://localhost:8080/',
     specPattern: 'src/test/javascript/cypress/e2e/**/*.cy.ts',
     supportFile: 'src/test/javascript/cypress/support/index.ts',
     experimentalRunAllSpecs: true,

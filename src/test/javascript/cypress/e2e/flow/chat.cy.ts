@@ -60,7 +60,7 @@ describe('Single chat conversation E2e tests', () => {
 
     it('I can send a message directly, it should create a conversation for me and display the answer', () => {
       cy.get('[data-cy="input-to-gpt"]').should('exist');
-      cy.get('[data-cy="input-to-gpt"]').type('I want to resume this conversation!');
+      cy.get('[data-cy="input-to-gpt"]').type('I want to create a new conversation!');
 
       cy.get('[data-cy="button-send-to-gpt"]').should('exist');
       cy.get('[data-cy="button-send-to-gpt"]').click();
@@ -70,6 +70,9 @@ describe('Single chat conversation E2e tests', () => {
 
       cy.get('[data-cy="thread-bubble-0-user-icon"]').should('exist');
       cy.get('[data-cy="thread-bubble-1-gpt-icon"]').should('exist');
+
+      cy.get('[data-cy="conversation-0"] [data-cy="delete"]').should('exist');
+      cy.get('[data-cy="conversation-0"] [data-cy="delete"]').click();
     });
 
     it('I can send a message from a previous conversation and still see the answer', () => {

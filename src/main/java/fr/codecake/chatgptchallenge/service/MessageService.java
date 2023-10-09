@@ -125,6 +125,11 @@ public class MessageService {
         messageRepository.deleteAllByConversation_PublicId(conversationPublicId);
     }
 
+    public void deleteByConversationId(Long conversationId) {
+        log.debug("Request to delete Message by conversation publicId : {}", conversationId);
+        messageRepository.deleteAllByConversation_Id(conversationId);
+    }
+
     public List<MessageDTO> saveAll(List<MessageDTO> messagesDTO) {
         log.debug("Request to save list of messages : {}", messagesDTO);
 

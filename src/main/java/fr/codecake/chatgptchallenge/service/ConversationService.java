@@ -146,8 +146,10 @@ public class ConversationService {
      *
      * @param id the id of the entity.
      */
+    @Transactional
     public void delete(Long id) {
         log.debug("Request to delete Conversation : {}", id);
+        messageService.deleteByConversationId(id);
         conversationRepository.deleteById(id);
     }
 

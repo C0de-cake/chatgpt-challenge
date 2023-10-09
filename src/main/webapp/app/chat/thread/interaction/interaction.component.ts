@@ -17,6 +17,9 @@ export class InteractionComponent implements OnInit {
   @Input()
   public first = false;
 
+  @Input()
+  public index = 0;
+
   account: Account | null = null;
 
   constructor(private accountService: AccountService, private markdownService: MarkdownService) {

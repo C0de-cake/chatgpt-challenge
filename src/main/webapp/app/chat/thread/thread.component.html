@@ -1,7 +1,7 @@
 <div id="main" class="d-flex flex-column">
   <div id="interaction-container">
-    <jhi-interaction *ngFor="let message of conversation?.messages; let first = first;" [message]="message"
-                     [first]="first"></jhi-interaction>
+    <jhi-interaction *ngFor="let message of conversation?.messages; let first = first; let index = index;" [message]="message"
+                     [first]="first" [index]="index"></jhi-interaction>
   </div>
   <div class="row mx-0 row-send-message">
     <div class="col-3"></div>

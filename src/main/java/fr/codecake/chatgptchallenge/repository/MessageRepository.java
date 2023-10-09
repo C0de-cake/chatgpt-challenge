@@ -16,4 +16,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     List<Message> findAllByConversation_Id(Long id);
 
     void deleteAllByConversation_PublicId(UUID publicId);
+
+    void deleteAllByConversation_Id(Long id);
 }
