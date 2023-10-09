@@ -12,6 +12,8 @@ describe('/admin', () => {
   const password = Cypress.env('E2E_ADMIN_PASSWORD') ?? 'admin';
 
   beforeEach(() => {
+    cy.log('username : ' + username)
+    cy.log('password : ' + password)
     cy.login(username, password);
     cy.visit('');
   });

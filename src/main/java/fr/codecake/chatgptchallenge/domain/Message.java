@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import fr.codecake.chatgptchallenge.domain.enumeration.Owner;
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.sql.Types;
 import java.time.Instant;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -34,6 +34,7 @@ public class Message implements Serializable {
     private Long id;
 
     @Lob
+    @JdbcTypeCode(Types.LONGVARCHAR)
     @Column(name = "content")
     private String content;
 

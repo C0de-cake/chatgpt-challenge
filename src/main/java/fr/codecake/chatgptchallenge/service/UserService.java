@@ -135,7 +135,7 @@ public class UserService {
             }
         } else {
             log.debug("Saving user '{}' in local database", user.getLogin());
-            userRepository.save(user);
+            userRepository.saveAndFlush(user);
             profileService.createForUser(user);
             this.clearUserCaches(user);
         }

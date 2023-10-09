@@ -35,15 +35,20 @@ jobs:
           npm run ci:backend:test
       - name: Package application
         run: npm run java:jar:prod
-#      - name: 'E2E: Package'
-#        run: npm run ci:e2e:package
-#      - name: 'E2E: Prepare'
-#        run: npm run ci:e2e:prepare
-#      - name: 'E2E: Run'
-#        run: npm run ci:e2e:run
-#        env:
-#          CYPRESS_ENABLE_RECORD: false
-#          CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
-#          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-#      - name: 'E2E: Teardown'
-#        run: npm run ci:e2e:teardown
+      - name: 'E2E: Package'
+        run: npm run ci:e2e:package
+      - name: 'E2E: Prepare'
+        run: npm run ci:e2e:prepare
+      - name: 'E2E: Run'
+        run: npm run ci:e2e:run
+        env:
+          CYPRESS_E2E_ADMIN_USERNAME: "e2ebot-admin@codecake.fr"
+          CYPRESS_E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+          CYPRESS_E2E_USER_USERNAME: "e2ebot-user@codecake.fr"
+          CYPRESS_E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD }}
+          CYPRESS_ENABLE_RECORD: true
+          CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET}}
+      - name: 'E2E: Teardown'
+        run: npm run ci:e2e:teardown

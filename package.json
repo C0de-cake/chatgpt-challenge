@@ -38,7 +38,7 @@
     "docker:keycloak:down": "docker compose -f src/main/docker/keycloak.yml down -v",
     "docker:keycloak:up": "docker compose -f src/main/docker/keycloak.yml up --wait",
     "e2e": "npm run e2e:cypress:headed --",
-    "e2e:cypress": "cypress run --e2e --browser chrome",
+    "e2e:cypress": "cypress run --e2e --browser chrome --record",
     "e2e:cypress:audits": "cypress run --e2e --browser chrome --config-file cypress-audits.config.js",
     "e2e:cypress:audits:headless": "npm run e2e:cypress -- --config-file cypress-audits.config.js",
     "pree2e:cypress:coverage": "npm run clean coverage && npm run ci:server:await",
