@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -27,6 +28,9 @@ public class Conversation implements Serializable {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "public_id")
+    private UUID publicId;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "conversation")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -59,6 +63,19 @@ public class Conversation implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public UUID getPublicId() {
+        return this.publicId;
+    }
+
+    public Conversation publicId(UUID publicId) {
+        this.setPublicId(publicId);
+        return this;
+    }
+
+    public void setPublicId(UUID publicId) {
+        this.publicId = publicId;
     }
 
     public Set<Message> getMessages() {
@@ -117,6 +134,7 @@ public class Conversation implements Serializable {
         return "Conversation{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
+            ", publicId='" + getPublicId() + "'" +
             "}";
     }
 }

@@ -3,6 +3,7 @@ package fr.codecake.chatgptchallenge.service.dto;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A DTO for the {@link fr.codecake.chatgptchallenge.domain.Conversation} entity.
@@ -14,7 +15,10 @@ public class ConversationDTO implements Serializable {
 
     private String name;
 
+    private UUID publicId;
+
     private List<MessageDTO> messages;
+
 
     public Long getId() {
         return id;
@@ -30,6 +34,14 @@ public class ConversationDTO implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public UUID getPublicId() {
+        return publicId;
+    }
+
+    public void setPublicId(UUID publicId) {
+        this.publicId = publicId;
     }
 
     public List<MessageDTO> getMessages() {
@@ -67,6 +79,7 @@ public class ConversationDTO implements Serializable {
         return "ConversationDTO{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
+            ", publicId='" + getPublicId() + "'" +
             "}";
     }
 }

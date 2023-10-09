@@ -1,6 +1,7 @@
 package fr.codecake.chatgptchallenge.service.dto;
 
 import fr.codecake.chatgptchallenge.domain.enumeration.Owner;
+import jakarta.persistence.Lob;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -12,6 +13,7 @@ public class MessageDTO implements Serializable {
 
     private Long id;
 
+    @Lob
     private String content;
 
     private Owner owner;

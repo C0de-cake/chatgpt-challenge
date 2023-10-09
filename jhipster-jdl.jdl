@@ -1,10 +1,11 @@
 
 entity Conversation {
 	name String
+    publicId UUID
 }
 
 entity Message {
-	content String,
+	content TextBlob,
     owner Owner
 }
 

@@ -14,6 +14,7 @@ import fr.codecake.chatgptchallenge.service.mapper.ConversationMapper;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,9 @@ class ConversationResourceIT {
 
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
+
+    private static final UUID DEFAULT_PUBLIC_ID = UUID.randomUUID();
+    private static final UUID UPDATED_PUBLIC_ID = UUID.randomUUID();
 
     private static final String ENTITY_API_URL = "/api/conversations";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -62,7 +66,7 @@ class ConversationResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Conversation createEntity(EntityManager em) {
-        Conversation conversation = new Conversation().name(DEFAULT_NAME);
+        Conversation conversation = new Conversation().name(DEFAULT_NAME).publicId(DEFAULT_PUBLIC_ID);
         return conversation;
     }
 
@@ -73,7 +77,7 @@ class ConversationResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Conversation createUpdatedEntity(EntityManager em) {
-        Conversation conversation = new Conversation().name(UPDATED_NAME);
+        Conversation conversation = new Conversation().name(UPDATED_NAME).publicId(UPDATED_PUBLIC_ID);
         return conversation;
     }
 
@@ -102,6 +106,7 @@ class ConversationResourceIT {
         assertThat(conversationList).hasSize(databaseSizeBeforeCreate + 1);
         Conversation testConversation = conversationList.get(conversationList.size() - 1);
         assertThat(testConversation.getName()).isEqualTo(DEFAULT_NAME);
+        assertThat(testConversation.getPublicId()).isEqualTo(DEFAULT_PUBLIC_ID);
     }
 
     @Test
@@ -140,7 +145,8 @@ class ConversationResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(conversation.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)));
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+            .andExpect(jsonPath("$.[*].publicId").value(hasItem(DEFAULT_PUBLIC_ID.toString())));
     }
 
     @Test
@@ -155,7 +161,8 @@ class ConversationResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(conversation.getId().intValue()))
-            .andExpect(jsonPath("$.name").value(DEFAULT_NAME));
+            .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
+            .andExpect(jsonPath("$.publicId").value(DEFAULT_PUBLIC_ID.toString()));
     }
 
     @Test
@@ -177,7 +184,7 @@ class ConversationResourceIT {
         Conversation updatedConversation = conversationRepository.findById(conversation.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedConversation are not directly saved in db
         em.detach(updatedConversation);
-        updatedConversation.name(UPDATED_NAME);
+        updatedConversation.name(UPDATED_NAME).publicId(UPDATED_PUBLIC_ID);
         ConversationDTO conversationDTO = conversationMapper.toDto(updatedConversation);
 
         restConversationMockMvc
@@ -194,6 +201,7 @@ class ConversationResourceIT {
         assertThat(conversationList).hasSize(databaseSizeBeforeUpdate);
         Conversation testConversation = conversationList.get(conversationList.size() - 1);
         assertThat(testConversation.getName()).isEqualTo(UPDATED_NAME);
+        assertThat(testConversation.getPublicId()).isEqualTo(UPDATED_PUBLIC_ID);
     }
 
     @Test
@@ -280,6 +288,8 @@ class ConversationResourceIT {
         Conversation partialUpdatedConversation = new Conversation();
         partialUpdatedConversation.setId(conversation.getId());
 
+        partialUpdatedConversation.publicId(UPDATED_PUBLIC_ID);
+
         restConversationMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedConversation.getId())
@@ -294,6 +304,7 @@ class ConversationResourceIT {
         assertThat(conversationList).hasSize(databaseSizeBeforeUpdate);
         Conversation testConversation = conversationList.get(conversationList.size() - 1);
         assertThat(testConversation.getName()).isEqualTo(DEFAULT_NAME);
+        assertThat(testConversation.getPublicId()).isEqualTo(UPDATED_PUBLIC_ID);
     }
 
     @Test
@@ -308,7 +319,7 @@ class ConversationResourceIT {
         Conversation partialUpdatedConversation = new Conversation();
         partialUpdatedConversation.setId(conversation.getId());
 
-        partialUpdatedConversation.name(UPDATED_NAME);
+        partialUpdatedConversation.name(UPDATED_NAME).publicId(UPDATED_PUBLIC_ID);
 
         restConversationMockMvc
             .perform(
@@ -324,6 +335,7 @@ class ConversationResourceIT {
         assertThat(conversationList).hasSize(databaseSizeBeforeUpdate);
         Conversation testConversation = conversationList.get(conversationList.size() - 1);
         assertThat(testConversation.getName()).isEqualTo(UPDATED_NAME);
+        assertThat(testConversation.getPublicId()).isEqualTo(UPDATED_PUBLIC_ID);
     }
 
     @Test

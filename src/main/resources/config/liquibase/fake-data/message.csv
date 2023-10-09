@@ -1,11 +1,11 @@
 id;content;owner
-1;Hawaii;GPT
-2;copying Volvo Clothing;GPT
-3;Neck monitor;GPT
-4;Toys channels Southeast;USER
-5;interfaces connect;USER
-6;Account;GPT
-7;quietly Forward finally;USER
-8;Concrete that Account;GPT
-9;lumen ivory;GPT
-10;Freeway red;GPT
+1;../fake-data/blob/hipster.txt;USER
+2;../fake-data/blob/hipster.txt;USER
+3;../fake-data/blob/hipster.txt;USER
+4;../fake-data/blob/hipster.txt;GPT
+5;../fake-data/blob/hipster.txt;GPT
+6;../fake-data/blob/hipster.txt;USER
+7;../fake-data/blob/hipster.txt;USER
+8;../fake-data/blob/hipster.txt;USER
+9;../fake-data/blob/hipster.txt;GPT
+10;../fake-data/blob/hipster.txt;GPT

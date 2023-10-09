@@ -24,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Base64Utils;
 
 /**
  * Integration tests for the {@link MessageResource} REST controller.
@@ -145,7 +146,7 @@ class MessageResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(message.getId().intValue())))
-            .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT)))
+            .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT.toString())))
             .andExpect(jsonPath("$.[*].owner").value(hasItem(DEFAULT_OWNER.toString())));
     }
 
@@ -161,7 +162,7 @@ class MessageResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(message.getId().intValue()))
-            .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT))
+            .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT.toString()))
             .andExpect(jsonPath("$.owner").value(DEFAULT_OWNER.toString()));
     }
 
@@ -288,6 +289,8 @@ class MessageResourceIT {
         Message partialUpdatedMessage = new Message();
         partialUpdatedMessage.setId(message.getId());
 
+        partialUpdatedMessage.owner(UPDATED_OWNER);
+
         restMessageMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedMessage.getId())
@@ -302,7 +305,7 @@ class MessageResourceIT {
         assertThat(messageList).hasSize(databaseSizeBeforeUpdate);
         Message testMessage = messageList.get(messageList.size() - 1);
         assertThat(testMessage.getContent()).isEqualTo(DEFAULT_CONTENT);
-        assertThat(testMessage.getOwner()).isEqualTo(DEFAULT_OWNER);
+        assertThat(testMessage.getOwner()).isEqualTo(UPDATED_OWNER);
     }
 
     @Test

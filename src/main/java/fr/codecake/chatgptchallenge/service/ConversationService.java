@@ -1,13 +1,10 @@
 package fr.codecake.chatgptchallenge.service;
 
 import fr.codecake.chatgptchallenge.domain.Conversation;
-import fr.codecake.chatgptchallenge.flow.message.dto.ConversationFlowDTO;
 import fr.codecake.chatgptchallenge.repository.ConversationRepository;
 import fr.codecake.chatgptchallenge.service.dto.ConversationDTO;
 import fr.codecake.chatgptchallenge.service.mapper.ConversationMapper;
-
 import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;

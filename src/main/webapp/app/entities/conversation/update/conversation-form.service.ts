@@ -19,6 +19,7 @@ type ConversationFormDefaults = Pick<NewConversation, 'id'>;
 type ConversationFormGroupContent = {
   id: FormControl<IConversation['id'] | NewConversation['id']>;
   name: FormControl<IConversation['name']>;
+  publicId: FormControl<IConversation['publicId']>;
 };
 
 export type ConversationFormGroup = FormGroup<ConversationFormGroupContent>;
@@ -39,6 +40,7 @@ export class ConversationFormService {
         }
       ),
       name: new FormControl(conversationRawValue.name),
+      publicId: new FormControl(conversationRawValue.publicId),
     });
   }
 

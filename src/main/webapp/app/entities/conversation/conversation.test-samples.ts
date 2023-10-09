@@ -1,17 +1,18 @@
 import { IConversation, NewConversation } from './conversation.model';
 
 export const sampleWithRequiredData: IConversation = {
-  id: 9543,
+  id: 12943,
 };
 
 export const sampleWithPartialData: IConversation = {
-  id: 9788,
-  name: 'Cloned Yuan',
+  id: 11069,
+  name: 'Yuan',
 };
 
 export const sampleWithFullData: IConversation = {
   id: 29816,
   name: 'East Customizable boo',
+  publicId: '023cbe66-be69-4e81-bb78-daa0aaafed75',
 };
 
 export const sampleWithNewData: NewConversation = {

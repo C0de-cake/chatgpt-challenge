@@ -160,8 +160,8 @@ describe('Message e2e test', () => {
     });
 
     it('should create an instance of Message', () => {
-      cy.get(`[data-cy="content"]`).type('architectures');
-      cy.get(`[data-cy="content"]`).should('have.value', 'architectures');
+      cy.get(`[data-cy="content"]`).type('../fake-data/blob/hipster.txt');
+      cy.get(`[data-cy="content"]`).invoke('val').should('match', new RegExp('../fake-data/blob/hipster.txt'));
 
       cy.get(`[data-cy="owner"]`).select('GPT');
 

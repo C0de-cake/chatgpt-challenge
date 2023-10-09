@@ -7,6 +7,10 @@
     {
       "fieldName": "name",
       "fieldType": "String"
+    },
+    {
+      "fieldName": "publicId",
+      "fieldType": "UUID"
     }
   ],
   "name": "Conversation",
