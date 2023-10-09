@@ -7,6 +7,7 @@ import fr.codecake.chatgptchallenge.service.mapper.MessageMapper;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -112,6 +113,16 @@ public class MessageService {
     public void delete(Long id) {
         log.debug("Request to delete Message : {}", id);
         messageRepository.deleteById(id);
+    }
+
+    /**
+     * Delete all messages by conversation id.
+     *
+     * @param conversationPublicId the id of the conversation.
+     */
+    public void deleteByConversationPublicId(UUID conversationPublicId) {
+        log.debug("Request to delete Message by conversation publicId : {}", conversationPublicId);
+        messageRepository.deleteAllByConversation_PublicId(conversationPublicId);
     }
 
     public List<MessageDTO> saveAll(List<MessageDTO> messagesDTO) {

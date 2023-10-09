@@ -151,9 +151,12 @@ public class ConversationService {
         conversationRepository.deleteById(id);
     }
 
+    @Transactional
     public void deleteByPublicId(String publicId, String login) {
         log.debug("Request to delete Conversation : {} / {}", publicId, login);
-        conversationRepository.deleteByPublicIdAndProfileUserLogin(UUID.fromString(publicId), login);
+        UUID publicIdUUID = UUID.fromString(publicId);
+        messageService.deleteByConversationPublicId(publicIdUUID);
+        conversationRepository.deleteByPublicIdAndProfileUserLogin(publicIdUUID, login);
     }
 
     public ConversationDTO saveWithMessages(ConversationDTO conversationDTO) {
