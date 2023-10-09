@@ -117,16 +117,14 @@ public class MessageService {
 
     public List<MessageDTO> saveAll(List<MessageDTO> messagesDTO) {
         log.debug("Request to save list of messages : {}", messagesDTO);
-        Set<Message> messagesToPersist = messagesDTO
-            .stream()
-            .map(messageMapper::toEntity)
-            .collect(Collectors.toSet());
 
-        List<Message> messages = messageRepository.saveAll(messagesToPersist);
+        List<Message> messagesToPersist = messageMapper.toEntityWithConversation(messagesDTO);
+        List<Message> messages = messageRepository.saveAllAndFlush(messagesToPersist);
 
-        return messages
-            .stream()
-            .map(messageMapper::toDto)
-            .collect(Collectors.toList());
+        return messageMapper.toDtoWithConversation(messages);
+    }
+
+    public List<Message> mapListToEntity(List<MessageDTO> messagesDTO) {
+        return messageMapper.toEntity(messagesDTO);
     }
 }
