@@ -23,10 +23,10 @@ export class ChatComponent implements OnInit {
 
   conversationSelected: IConversationWithMessages = {id: 0};
 
+  public loadingMessage = false;
+
   isEditMode = false;
   private clonedName: string | null | undefined = '';
-
-  public loadingMessage = false;
 
   constructor(private conversationService: ConversationService,
               private alertService: AlertService,
@@ -94,8 +94,7 @@ export class ChatComponent implements OnInit {
     dayjs(b.key, 'MMMM').toDate().getTime() - dayjs(a.key, 'MMMM').toDate().getTime();
 
   onNewConversation(): void {
-    this.conversationSelected = {id: 0};
-    this.router.navigate(['chat']);
+   this.resetUI();
   }
 
   onSendMessage(newMessage: string): void {
@@ -129,8 +128,14 @@ export class ChatComponent implements OnInit {
         type: 'success', toast: true
       };
       this.alertService.addAlert(alert);
+      this.resetUI();
       this.fetchConversations();
     }
+  }
+
+  private resetUI(): void {
+    this.conversationSelected = {id: 0};
+    this.router.navigate(['chat']);
   }
 
   private handleErrorRename(err: HttpErrorResponse): void {
@@ -217,7 +222,6 @@ export class ChatComponent implements OnInit {
   private onMessageSuccess(res: EntityResponseType, messageContentFromUser: string): void {
     this.loadingMessage = false;
     const flowMessageResponse = res.body;
-    console.dir(flowMessageResponse);
     if (flowMessageResponse?.conversation) {
       this.mapNewConversationAndMessagesFromAPI(flowMessageResponse, messageContentFromUser);
       this.putNewConversationInCurrentMonth();
@@ -230,7 +234,6 @@ export class ChatComponent implements OnInit {
   private putMessageInExistingConversation(flowMessageResponse: FlowMessageResponseDTO | null, messageContentFromUser: string): void {
     for (const conversationsEntry of this.conversationsByMonths.entries()) {
       for (const conversation of conversationsEntry[1]) {
-        console.dir(flowMessageResponse?.conversationPublicId);
         if (conversation.publicId === flowMessageResponse?.conversationPublicId) {
           if (flowMessageResponse && this.conversationSelected.messages) {
             const messageGPT: IMessage = {id: 1, content: flowMessageResponse.content, owner: "GPT"};

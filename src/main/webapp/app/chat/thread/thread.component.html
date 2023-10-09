@@ -1,9 +1,9 @@
 <div id="main" class="d-flex flex-column">
-  <div style="overflow-y: scroll;">
+  <div id="interaction-container">
     <jhi-interaction *ngFor="let message of conversation?.messages; let first = first;" [message]="message"
                      [first]="first"></jhi-interaction>
   </div>
-  <div class="row mx-0" style="margin-top: auto;">
+  <div class="row mx-0 row-send-message">
     <div class="col-3"></div>
     <div class="col-6">
       <form #messageForm="ngForm">
