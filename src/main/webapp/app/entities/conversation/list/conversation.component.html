@@ -50,6 +50,30 @@
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
+          <th scope="col" jhiSortBy="createdBy">
+            <div class="d-flex">
+              <span jhiTranslate="chatgptChallengeApp.conversation.createdBy">Created By</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="createdDate">
+            <div class="d-flex">
+              <span jhiTranslate="chatgptChallengeApp.conversation.createdDate">Created Date</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="lastModifiedBy">
+            <div class="d-flex">
+              <span jhiTranslate="chatgptChallengeApp.conversation.lastModifiedBy">Last Modified By</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="lastModifiedDate">
+            <div class="d-flex">
+              <span jhiTranslate="chatgptChallengeApp.conversation.lastModifiedDate">Last Modified Date</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
           <th scope="col" jhiSortBy="profile.id">
             <div class="d-flex">
               <span jhiTranslate="chatgptChallengeApp.conversation.profile">Profile</span>
@@ -66,6 +90,10 @@
           </td>
           <td>{{ conversation.name }}</td>
           <td>{{ conversation.publicId }}</td>
+          <td>{{ conversation.createdBy }}</td>
+          <td>{{ conversation.createdDate | formatMediumDatetime }}</td>
+          <td>{{ conversation.lastModifiedBy }}</td>
+          <td>{{ conversation.lastModifiedDate | formatMediumDatetime }}</td>
           <td>
             <div *ngIf="conversation.profile">
               <a [routerLink]="['/profile', conversation.profile.id, 'view']">{{ conversation.profile.id }}</a>

@@ -21,6 +21,10 @@ describe('Profile Form Service', () => {
           expect.objectContaining({
             id: expect.any(Object),
             subscription: expect.any(Object),
+            createdBy: expect.any(Object),
+            createdDate: expect.any(Object),
+            lastModifiedBy: expect.any(Object),
+            lastModifiedDate: expect.any(Object),
             user: expect.any(Object),
           })
         );
@@ -33,6 +37,10 @@ describe('Profile Form Service', () => {
           expect.objectContaining({
             id: expect.any(Object),
             subscription: expect.any(Object),
+            createdBy: expect.any(Object),
+            createdDate: expect.any(Object),
+            lastModifiedBy: expect.any(Object),
+            lastModifiedDate: expect.any(Object),
             user: expect.any(Object),
           })
         );

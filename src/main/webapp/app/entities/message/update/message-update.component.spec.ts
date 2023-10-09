@@ -50,10 +50,10 @@ describe('Message Management Update Component', () => {
   describe('ngOnInit', () => {
     it('Should call Conversation query and add missing value', () => {
       const message: IMessage = { id: 456 };
-      const conversation: IConversation = { id: 9420 };
+      const conversation: IConversation = { id: 30200 };
       message.conversation = conversation;
 
-      const conversationCollection: IConversation[] = [{ id: 22329 }];
+      const conversationCollection: IConversation[] = [{ id: 19376 }];
       jest.spyOn(conversationService, 'query').mockReturnValue(of(new HttpResponse({ body: conversationCollection })));
       const additionalConversations = [conversation];
       const expectedCollection: IConversation[] = [...additionalConversations, ...conversationCollection];
@@ -72,7 +72,7 @@ describe('Message Management Update Component', () => {
 
     it('Should update editForm', () => {
       const message: IMessage = { id: 456 };
-      const conversation: IConversation = { id: 8241 };
+      const conversation: IConversation = { id: 1450 };
       message.conversation = conversation;
 
       activatedRoute.data = of({ message });

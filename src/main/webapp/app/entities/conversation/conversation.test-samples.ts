@@ -1,19 +1,25 @@
+import dayjs from 'dayjs/esm';
+
 import { IConversation, NewConversation } from './conversation.model';
 
 export const sampleWithRequiredData: IConversation = {
-  id: 19776,
+  id: 16132,
 };
 
 export const sampleWithPartialData: IConversation = {
-  id: 29629,
-  name: 'Human Alabama',
-  publicId: '8e24b311-d1af-4b09-bc84-2660d54a395c',
+  id: 4707,
+  createdBy: 'female',
+  createdDate: dayjs('2023-07-16T23:58'),
 };
 
 export const sampleWithFullData: IConversation = {
-  id: 12434,
-  name: 'Bicycle auxiliary why',
-  publicId: '4b4f6722-aae8-4984-80dc-e9077e4e5e7b',
+  id: 3473,
+  name: 'Ohio past Borders',
+  publicId: 'c842660d-54a3-495c-9f6f-caa70ef4b4f6',
+  createdBy: 'Baby',
+  createdDate: dayjs('2023-07-16T09:39'),
+  lastModifiedBy: 'provident port West',
+  lastModifiedDate: dayjs('2023-07-16T06:47'),
 };
 
 export const sampleWithNewData: NewConversation = {

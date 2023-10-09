@@ -163,7 +163,21 @@ describe('Message e2e test', () => {
       cy.get(`[data-cy="content"]`).type('../fake-data/blob/hipster.txt');
       cy.get(`[data-cy="content"]`).invoke('val').should('match', new RegExp('../fake-data/blob/hipster.txt'));
 
-      cy.get(`[data-cy="owner"]`).select('GPT');
+      cy.get(`[data-cy="owner"]`).select('USER');
+
+      cy.get(`[data-cy="createdBy"]`).type('omnis');
+      cy.get(`[data-cy="createdBy"]`).should('have.value', 'omnis');
+
+      cy.get(`[data-cy="createdDate"]`).type('2023-07-16T09:40');
+      cy.get(`[data-cy="createdDate"]`).blur();
+      cy.get(`[data-cy="createdDate"]`).should('have.value', '2023-07-16T09:40');
+
+      cy.get(`[data-cy="lastModifiedBy"]`).type('Kina');
+      cy.get(`[data-cy="lastModifiedBy"]`).should('have.value', 'Kina');
+
+      cy.get(`[data-cy="lastModifiedDate"]`).type('2023-07-16T21:26');
+      cy.get(`[data-cy="lastModifiedDate"]`).blur();
+      cy.get(`[data-cy="lastModifiedDate"]`).should('have.value', '2023-07-16T21:26');
 
       cy.get(entityCreateSaveButtonSelector).click();
 

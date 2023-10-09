@@ -12,6 +12,8 @@ import fr.codecake.chatgptchallenge.repository.ConversationRepository;
 import fr.codecake.chatgptchallenge.service.dto.ConversationDTO;
 import fr.codecake.chatgptchallenge.service.mapper.ConversationMapper;
 import jakarta.persistence.EntityManager;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -38,6 +40,24 @@ class ConversationResourceIT {
 
     private static final UUID DEFAULT_PUBLIC_ID = UUID.randomUUID();
     private static final UUID UPDATED_PUBLIC_ID = UUID.randomUUID();
+
+    private static final String DEFAULT_CREATED_BY_USER = "user";
+
+    private static final String DEFAULT_CREATED_BY_SYSTEM = "system";
+
+    private static final String UPDATED_CREATED_BY_USER = "user";
+
+    private static final String UPDATED_CREATED_BY_SYSTEM = "system";
+
+    private static final Instant DEFAULT_CREATED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final String DEFAULT_LAST_MODIFIED_BY_USER = "user";
+    private static final String UPDATED_LAST_MODIFIED_BY_USER = "user";
+    private static final String UPDATED_LAST_MODIFIED_BY_SYSTEM = "system";
+
+    private static final Instant DEFAULT_LAST_MODIFIED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_LAST_MODIFIED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/conversations";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -66,7 +86,13 @@ class ConversationResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Conversation createEntity(EntityManager em) {
-        Conversation conversation = new Conversation().name(DEFAULT_NAME).publicId(DEFAULT_PUBLIC_ID);
+        Conversation conversation = new Conversation()
+            .name(DEFAULT_NAME)
+            .publicId(DEFAULT_PUBLIC_ID)
+            .createdBy(DEFAULT_CREATED_BY_USER)
+            .createdDate(DEFAULT_CREATED_DATE)
+            .lastModifiedBy(DEFAULT_LAST_MODIFIED_BY_USER)
+            .lastModifiedDate(DEFAULT_LAST_MODIFIED_DATE);
         return conversation;
     }
 
@@ -77,7 +103,13 @@ class ConversationResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Conversation createUpdatedEntity(EntityManager em) {
-        Conversation conversation = new Conversation().name(UPDATED_NAME).publicId(UPDATED_PUBLIC_ID);
+        Conversation conversation = new Conversation()
+            .name(UPDATED_NAME)
+            .publicId(UPDATED_PUBLIC_ID)
+            .createdBy(UPDATED_CREATED_BY_USER)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY_USER)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
         return conversation;
     }
 
@@ -107,6 +139,10 @@ class ConversationResourceIT {
         Conversation testConversation = conversationList.get(conversationList.size() - 1);
         assertThat(testConversation.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testConversation.getPublicId()).isEqualTo(DEFAULT_PUBLIC_ID);
+        assertThat(testConversation.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY_USER);
+        assertThat(testConversation.getCreatedDate()).isNotNull();
+        assertThat(testConversation.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY_USER);
+        assertThat(testConversation.getLastModifiedDate()).isNotNull();
     }
 
     @Test
@@ -146,7 +182,11 @@ class ConversationResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(conversation.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].publicId").value(hasItem(DEFAULT_PUBLIC_ID.toString())));
+            .andExpect(jsonPath("$.[*].publicId").value(hasItem(DEFAULT_PUBLIC_ID.toString())))
+            .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY_USER)))
+            .andExpect(jsonPath("$.[*].createdDate").exists())
+            .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY_USER)))
+            .andExpect(jsonPath("$.[*].lastModifiedDate").exists());
     }
 
     @Test
@@ -162,7 +202,11 @@ class ConversationResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(conversation.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
-            .andExpect(jsonPath("$.publicId").value(DEFAULT_PUBLIC_ID.toString()));
+            .andExpect(jsonPath("$.publicId").value(DEFAULT_PUBLIC_ID.toString()))
+            .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY_USER))
+            .andExpect(jsonPath("$.createdDate").exists())
+            .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY_USER))
+            .andExpect(jsonPath("$.lastModifiedDate").exists());
     }
 
     @Test
@@ -184,7 +228,13 @@ class ConversationResourceIT {
         Conversation updatedConversation = conversationRepository.findById(conversation.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedConversation are not directly saved in db
         em.detach(updatedConversation);
-        updatedConversation.name(UPDATED_NAME).publicId(UPDATED_PUBLIC_ID);
+        updatedConversation
+            .name(UPDATED_NAME)
+            .publicId(UPDATED_PUBLIC_ID)
+            .createdBy(UPDATED_CREATED_BY_USER)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY_USER)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
         ConversationDTO conversationDTO = conversationMapper.toDto(updatedConversation);
 
         restConversationMockMvc
@@ -202,6 +252,10 @@ class ConversationResourceIT {
         Conversation testConversation = conversationList.get(conversationList.size() - 1);
         assertThat(testConversation.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testConversation.getPublicId()).isEqualTo(UPDATED_PUBLIC_ID);
+        assertThat(testConversation.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY_USER);
+        assertThat(testConversation.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
+        assertThat(testConversation.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY_SYSTEM);
+        assertThat(testConversation.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
     }
 
     @Test
@@ -288,7 +342,7 @@ class ConversationResourceIT {
         Conversation partialUpdatedConversation = new Conversation();
         partialUpdatedConversation.setId(conversation.getId());
 
-        partialUpdatedConversation.publicId(UPDATED_PUBLIC_ID);
+        partialUpdatedConversation.createdDate(UPDATED_CREATED_DATE).lastModifiedBy(UPDATED_LAST_MODIFIED_BY_USER);
 
         restConversationMockMvc
             .perform(
@@ -304,7 +358,11 @@ class ConversationResourceIT {
         assertThat(conversationList).hasSize(databaseSizeBeforeUpdate);
         Conversation testConversation = conversationList.get(conversationList.size() - 1);
         assertThat(testConversation.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testConversation.getPublicId()).isEqualTo(UPDATED_PUBLIC_ID);
+        assertThat(testConversation.getPublicId()).isEqualTo(DEFAULT_PUBLIC_ID);
+        assertThat(testConversation.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY_USER);
+        assertThat(testConversation.getCreatedDate()).isNotNull();
+        assertThat(testConversation.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY_SYSTEM);
+        assertThat(testConversation.getLastModifiedDate()).isNotNull();
     }
 
     @Test
@@ -319,7 +377,13 @@ class ConversationResourceIT {
         Conversation partialUpdatedConversation = new Conversation();
         partialUpdatedConversation.setId(conversation.getId());
 
-        partialUpdatedConversation.name(UPDATED_NAME).publicId(UPDATED_PUBLIC_ID);
+        partialUpdatedConversation
+            .name(UPDATED_NAME)
+            .publicId(UPDATED_PUBLIC_ID)
+            .createdBy(UPDATED_CREATED_BY_USER)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY_USER)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restConversationMockMvc
             .perform(
@@ -336,6 +400,10 @@ class ConversationResourceIT {
         Conversation testConversation = conversationList.get(conversationList.size() - 1);
         assertThat(testConversation.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testConversation.getPublicId()).isEqualTo(UPDATED_PUBLIC_ID);
+        assertThat(testConversation.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY_USER);
+        assertThat(testConversation.getCreatedDate()).isNotNull();
+        assertThat(testConversation.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY_SYSTEM);
+        assertThat(testConversation.getLastModifiedDate()).isNotNull();
     }
 
     @Test

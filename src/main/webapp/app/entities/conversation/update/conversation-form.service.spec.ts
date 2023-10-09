@@ -22,6 +22,10 @@ describe('Conversation Form Service', () => {
             id: expect.any(Object),
             name: expect.any(Object),
             publicId: expect.any(Object),
+            createdBy: expect.any(Object),
+            createdDate: expect.any(Object),
+            lastModifiedBy: expect.any(Object),
+            lastModifiedDate: expect.any(Object),
             profile: expect.any(Object),
           })
         );
@@ -35,6 +39,10 @@ describe('Conversation Form Service', () => {
             id: expect.any(Object),
             name: expect.any(Object),
             publicId: expect.any(Object),
+            createdBy: expect.any(Object),
+            createdDate: expect.any(Object),
+            lastModifiedBy: expect.any(Object),
+            lastModifiedDate: expect.any(Object),
             profile: expect.any(Object),
           })
         );

@@ -9,9 +9,10 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link Conversation} and its DTO {@link ConversationDTO}.
  */
-@Mapper(componentModel = "spring", uses = {MessageMapper.class})
+@Mapper(componentModel = "spring", uses = {MessageMapper.class, UserMapper.class})
 public interface ConversationMapper extends EntityMapper<ConversationDTO, Conversation> {
     @Mapping(target = "profile", source = "profile", qualifiedByName = "profileId")
+    @Mapping(target = "profile.user", source = "profile.user", ignore = true)
     ConversationDTO toDto(Conversation s);
 
     @Named("profileId")
@@ -26,4 +27,8 @@ public interface ConversationMapper extends EntityMapper<ConversationDTO, Conver
     @Named("with-messages")
     @Mapping(target = "messages", source = "messages", qualifiedByName = "without-conversation")
     Conversation toEntityWithMessages(ConversationDTO conversationDTO);
+
+    @Override
+    @Mapping(target = "profile.user", source = "profile.user", ignore = true)
+    Conversation toEntity(ConversationDTO dto);
 }

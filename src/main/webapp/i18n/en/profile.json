@@ -19,6 +19,10 @@
       },
       "id": "ID",
       "subscription": "Subscription",
+      "createdBy": "Created By",
+      "createdDate": "Created Date",
+      "lastModifiedBy": "Last Modified By",
+      "lastModifiedDate": "Last Modified Date",
       "user": "User",
       "conversation": "Conversation"
     }

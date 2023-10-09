@@ -4,10 +4,12 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { IProfile } from '../profile.model';
 import { sampleWithRequiredData, sampleWithNewData, sampleWithPartialData, sampleWithFullData } from '../profile.test-samples';
 
-import { ProfileService } from './profile.service';
+import { ProfileService, RestProfile } from './profile.service';
 
-const requireRestSample: IProfile = {
+const requireRestSample: RestProfile = {
   ...sampleWithRequiredData,
+  createdDate: sampleWithRequiredData.createdDate?.toJSON(),
+  lastModifiedDate: sampleWithRequiredData.lastModifiedDate?.toJSON(),
 };
 
 describe('Profile Service', () => {

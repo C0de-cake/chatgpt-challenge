@@ -20,6 +20,10 @@
       "id": "ID",
       "name": "Name",
       "publicId": "Public Id",
+      "createdBy": "Created By",
+      "createdDate": "Created Date",
+      "lastModifiedBy": "Last Modified By",
+      "lastModifiedDate": "Last Modified Date",
       "message": "Message",
       "profile": "Profile"
     }

@@ -134,9 +134,9 @@ public class ConversationService {
         return conversationDTO;
     }
 
-    @Transactional(readOnly = true)
-    public Optional<ConversationDTO> findOneByPublicId(UUID publicId) {
-        log.debug("Request to get Conversation by public id : {}", publicId);
-        return conversationRepository.findOneByPublicId(publicId).map(conversationMapper::toDto);
-    }
+//    @Transactional(readOnly = true)
+//    public Optional<ConversationDTO> findOneByPublicId(UUID publicId) {
+//        log.debug("Request to get Conversation by public id : {}", publicId);
+//        return conversationRepository.findOneByPublicId(publicId).map(conversationMapper::toDto);
+//    }
 }

@@ -4,10 +4,12 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { IMessage } from '../message.model';
 import { sampleWithRequiredData, sampleWithNewData, sampleWithPartialData, sampleWithFullData } from '../message.test-samples';
 
-import { MessageService } from './message.service';
+import { MessageService, RestMessage } from './message.service';
 
-const requireRestSample: IMessage = {
+const requireRestSample: RestMessage = {
   ...sampleWithRequiredData,
+  createdDate: sampleWithRequiredData.createdDate?.toJSON(),
+  lastModifiedDate: sampleWithRequiredData.lastModifiedDate?.toJSON(),
 };
 
 describe('Message Service', () => {

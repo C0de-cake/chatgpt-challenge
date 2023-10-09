@@ -2,12 +2,27 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+import { map } from 'rxjs/operators';
+
+import dayjs from 'dayjs/esm';
+
 import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
 import { IMessage, NewMessage } from '../message.model';
 
 export type PartialUpdateMessage = Partial<IMessage> & Pick<IMessage, 'id'>;
+
+type RestOf<T extends IMessage | NewMessage> = Omit<T, 'createdDate' | 'lastModifiedDate'> & {
+  createdDate?: string | null;
+  lastModifiedDate?: string | null;
+};
+
+export type RestMessage = RestOf<IMessage>;
+
+export type NewRestMessage = RestOf<NewMessage>;
+
+export type PartialUpdateRestMessage = RestOf<PartialUpdateMessage>;
 
 export type EntityResponseType = HttpResponse<IMessage>;
 export type EntityArrayResponseType = HttpResponse<IMessage[]>;
@@ -19,24 +34,37 @@ export class MessageService {
   constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {}
 
   create(message: NewMessage): Observable<EntityResponseType> {
-    return this.http.post<IMessage>(this.resourceUrl, message, { observe: 'response' });
+    const copy = this.convertDateFromClient(message);
+    return this.http
+      .post<RestMessage>(this.resourceUrl, copy, { observe: 'response' })
+      .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
   update(message: IMessage): Observable<EntityResponseType> {
-    return this.http.put<IMessage>(`${this.resourceUrl}/${this.getMessageIdentifier(message)}`, message, { observe: 'response' });
+    const copy = this.convertDateFromClient(message);
+    return this.http
+      .put<RestMessage>(`${this.resourceUrl}/${this.getMessageIdentifier(message)}`, copy, { observe: 'response' })
+      .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
   partialUpdate(message: PartialUpdateMessage): Observable<EntityResponseType> {
-    return this.http.patch<IMessage>(`${this.resourceUrl}/${this.getMessageIdentifier(message)}`, message, { observe: 'response' });
+    const copy = this.convertDateFromClient(message);
+    return this.http
+      .patch<RestMessage>(`${this.resourceUrl}/${this.getMessageIdentifier(message)}`, copy, { observe: 'response' })
+      .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
   find(id: number): Observable<EntityResponseType> {
-    return this.http.get<IMessage>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+    return this.http
+      .get<RestMessage>(`${this.resourceUrl}/${id}`, { observe: 'response' })
+      .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {
     const options = createRequestOption(req);
-    return this.http.get<IMessage[]>(this.resourceUrl, { params: options, observe: 'response' });
+    return this.http
+      .get<RestMessage[]>(this.resourceUrl, { params: options, observe: 'response' })
+      .pipe(map(res => this.convertResponseArrayFromServer(res)));
   }
 
   delete(id: number): Observable<HttpResponse<{}>> {
@@ -69,5 +97,33 @@ export class MessageService {
       return [...messagesToAdd, ...messageCollection];
     }
     return messageCollection;
+  }
+
+  protected convertDateFromClient<T extends IMessage | NewMessage | PartialUpdateMessage>(message: T): RestOf<T> {
+    return {
+      ...message,
+      createdDate: message.createdDate?.toJSON() ?? null,
+      lastModifiedDate: message.lastModifiedDate?.toJSON() ?? null,
+    };
+  }
+
+  protected convertDateFromServer(restMessage: RestMessage): IMessage {
+    return {
+      ...restMessage,
+      createdDate: restMessage.createdDate ? dayjs(restMessage.createdDate) : undefined,
+      lastModifiedDate: restMessage.lastModifiedDate ? dayjs(restMessage.lastModifiedDate) : undefined,
+    };
+  }
+
+  protected convertResponseFromServer(res: HttpResponse<RestMessage>): HttpResponse<IMessage> {
+    return res.clone({
+      body: res.body ? this.convertDateFromServer(res.body) : null,
+    });
+  }
+
+  protected convertResponseArrayFromServer(res: HttpResponse<RestMessage[]>): HttpResponse<IMessage[]> {
+    return res.clone({
+      body: res.body ? res.body.map(item => this.convertDateFromServer(item)) : null,
+    });
   }
 }

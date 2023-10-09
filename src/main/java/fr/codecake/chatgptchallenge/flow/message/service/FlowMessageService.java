@@ -46,13 +46,13 @@ public class FlowMessageService {
         if (flowMessageQueryDTO.getNewConversation()) {
             handleNewMessage(flowMessageQueryDTO, flowMessageResponseDTO, new ConversationDTO(), profileConnectedUser);
         } else {
-            ConversationDTO existingConversation =
-                conversationService.findOneByPublicIdAndProfileId(
-                        flowMessageQueryDTO.getConversationPublicId(), profileConnectedUser.getId())
-                    .orElseThrow(() -> new ConversationNotExistException(format("Conversation with the following public id and profile id doesn't exist %s, %s ",
-                        flowMessageQueryDTO.getConversationPublicId(), profileConnectedUser.getId())));
-
-            handleNewMessage(flowMessageQueryDTO, flowMessageResponseDTO, existingConversation, profileConnectedUser);
+//            ConversationDTO existingConversation =
+//                conversationService.findOneByPublicIdAndProfileId(
+//                        flowMessageQueryDTO.getConversationPublicId(), profileConnectedUser.getId())
+//                    .orElseThrow(() -> new ConversationNotExistException(format("Conversation with the following public id and profile id doesn't exist %s, %s ",
+//                        flowMessageQueryDTO.getConversationPublicId(), profileConnectedUser.getId())));
+//
+//            handleNewMessage(flowMessageQueryDTO, flowMessageResponseDTO, existingConversation, profileConnectedUser);
         }
         return flowMessageResponseDTO;
     }

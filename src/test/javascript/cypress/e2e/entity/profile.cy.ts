@@ -162,6 +162,20 @@ describe('Profile e2e test', () => {
     it('should create an instance of Profile', () => {
       cy.get(`[data-cy="subscription"]`).select('FREE');
 
+      cy.get(`[data-cy="createdBy"]`).type('um Electric Sports');
+      cy.get(`[data-cy="createdBy"]`).should('have.value', 'um Electric Sports');
+
+      cy.get(`[data-cy="createdDate"]`).type('2023-07-27T09:26');
+      cy.get(`[data-cy="createdDate"]`).blur();
+      cy.get(`[data-cy="createdDate"]`).should('have.value', '2023-07-27T09:26');
+
+      cy.get(`[data-cy="lastModifiedBy"]`).type('gleefully Chrysler');
+      cy.get(`[data-cy="lastModifiedBy"]`).should('have.value', 'gleefully Chrysler');
+
+      cy.get(`[data-cy="lastModifiedDate"]`).type('2023-07-28T03:02');
+      cy.get(`[data-cy="lastModifiedDate"]`).blur();
+      cy.get(`[data-cy="lastModifiedDate"]`).should('have.value', '2023-07-28T03:02');
+
       cy.get(entityCreateSaveButtonSelector).click();
 
       cy.wait('@postEntityRequest').then(({ response }) => {

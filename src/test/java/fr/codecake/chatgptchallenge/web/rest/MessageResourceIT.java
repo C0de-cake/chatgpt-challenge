@@ -13,6 +13,8 @@ import fr.codecake.chatgptchallenge.repository.MessageRepository;
 import fr.codecake.chatgptchallenge.service.dto.MessageDTO;
 import fr.codecake.chatgptchallenge.service.mapper.MessageMapper;
 import jakarta.persistence.EntityManager;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -24,7 +26,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Base64Utils;
 
 /**
  * Integration tests for the {@link MessageResource} REST controller.
@@ -39,6 +40,21 @@ class MessageResourceIT {
 
     private static final Owner DEFAULT_OWNER = Owner.USER;
     private static final Owner UPDATED_OWNER = Owner.GPT;
+
+    private static final String DEFAULT_CREATED_BY_USER = "user";
+    private static final String DEFAULT_CREATED_BY_SYSTEM = "system";
+    private static final String UPDATED_CREATED_BY_USER = "user";
+    private static final String UPDATED_CREATED_BY_SYSTEM = "system";
+
+    private static final Instant DEFAULT_CREATED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final String DEFAULT_LAST_MODIFIED_BY_USER = "user";
+    private static final String DEFAULT_LAST_MODIFIED_BY_SYSTEM = "system";
+    private static final String UPDATED_LAST_MODIFIED_BY_USER = "user";
+    private static final String UPDATED_LAST_MODIFIED_BY_SYSTEM = "system";
+    private static final Instant DEFAULT_LAST_MODIFIED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_LAST_MODIFIED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/messages";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -67,7 +83,13 @@ class MessageResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Message createEntity(EntityManager em) {
-        Message message = new Message().content(DEFAULT_CONTENT).owner(DEFAULT_OWNER);
+        Message message = new Message()
+            .content(DEFAULT_CONTENT)
+            .owner(DEFAULT_OWNER)
+            .createdBy(DEFAULT_CREATED_BY_USER)
+            .createdDate(DEFAULT_CREATED_DATE)
+            .lastModifiedBy(DEFAULT_LAST_MODIFIED_BY_USER)
+            .lastModifiedDate(DEFAULT_LAST_MODIFIED_DATE);
         return message;
     }
 
@@ -78,7 +100,13 @@ class MessageResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Message createUpdatedEntity(EntityManager em) {
-        Message message = new Message().content(UPDATED_CONTENT).owner(UPDATED_OWNER);
+        Message message = new Message()
+            .content(UPDATED_CONTENT)
+            .owner(UPDATED_OWNER)
+            .createdBy(UPDATED_CREATED_BY_USER)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY_USER)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
         return message;
     }
 
@@ -108,6 +136,10 @@ class MessageResourceIT {
         Message testMessage = messageList.get(messageList.size() - 1);
         assertThat(testMessage.getContent()).isEqualTo(DEFAULT_CONTENT);
         assertThat(testMessage.getOwner()).isEqualTo(DEFAULT_OWNER);
+        assertThat(testMessage.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY_USER);
+        assertThat(testMessage.getCreatedDate()).isNotNull();
+        assertThat(testMessage.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY_USER);
+        assertThat(testMessage.getLastModifiedDate()).isNotNull();
     }
 
     @Test
@@ -147,7 +179,11 @@ class MessageResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(message.getId().intValue())))
             .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT.toString())))
-            .andExpect(jsonPath("$.[*].owner").value(hasItem(DEFAULT_OWNER.toString())));
+            .andExpect(jsonPath("$.[*].owner").value(hasItem(DEFAULT_OWNER.toString())))
+            .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY_USER)))
+            .andExpect(jsonPath("$.[*].createdDate").exists())
+            .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY_USER)))
+            .andExpect(jsonPath("$.[*].lastModifiedDate").exists());
     }
 
     @Test
@@ -163,7 +199,11 @@ class MessageResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(message.getId().intValue()))
             .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT.toString()))
-            .andExpect(jsonPath("$.owner").value(DEFAULT_OWNER.toString()));
+            .andExpect(jsonPath("$.owner").value(DEFAULT_OWNER.toString()))
+            .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY_USER))
+            .andExpect(jsonPath("$.createdDate").exists())
+            .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY_USER))
+            .andExpect(jsonPath("$.lastModifiedDate").exists());
     }
 
     @Test
@@ -185,7 +225,13 @@ class MessageResourceIT {
         Message updatedMessage = messageRepository.findById(message.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedMessage are not directly saved in db
         em.detach(updatedMessage);
-        updatedMessage.content(UPDATED_CONTENT).owner(UPDATED_OWNER);
+        updatedMessage
+            .content(UPDATED_CONTENT)
+            .owner(UPDATED_OWNER)
+            .createdBy(UPDATED_CREATED_BY_USER)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY_USER)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
         MessageDTO messageDTO = messageMapper.toDto(updatedMessage);
 
         restMessageMockMvc
@@ -203,6 +249,10 @@ class MessageResourceIT {
         Message testMessage = messageList.get(messageList.size() - 1);
         assertThat(testMessage.getContent()).isEqualTo(UPDATED_CONTENT);
         assertThat(testMessage.getOwner()).isEqualTo(UPDATED_OWNER);
+        assertThat(testMessage.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY_USER);
+        assertThat(testMessage.getCreatedDate()).isNotNull();
+        assertThat(testMessage.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY_SYSTEM);
+        assertThat(testMessage.getLastModifiedDate()).isNotNull();
     }
 
     @Test
@@ -289,7 +339,7 @@ class MessageResourceIT {
         Message partialUpdatedMessage = new Message();
         partialUpdatedMessage.setId(message.getId());
 
-        partialUpdatedMessage.content(UPDATED_CONTENT);
+        partialUpdatedMessage.content(UPDATED_CONTENT).lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restMessageMockMvc
             .perform(
@@ -306,6 +356,10 @@ class MessageResourceIT {
         Message testMessage = messageList.get(messageList.size() - 1);
         assertThat(testMessage.getContent()).isEqualTo(UPDATED_CONTENT);
         assertThat(testMessage.getOwner()).isEqualTo(DEFAULT_OWNER);
+        assertThat(testMessage.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY_USER);
+        assertThat(testMessage.getCreatedDate()).isNotNull();
+        assertThat(testMessage.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY_SYSTEM);
+        assertThat(testMessage.getLastModifiedDate()).isNotNull();
     }
 
     @Test
@@ -320,7 +374,13 @@ class MessageResourceIT {
         Message partialUpdatedMessage = new Message();
         partialUpdatedMessage.setId(message.getId());
 
-        partialUpdatedMessage.content(UPDATED_CONTENT).owner(UPDATED_OWNER);
+        partialUpdatedMessage
+            .content(UPDATED_CONTENT)
+            .owner(UPDATED_OWNER)
+            .createdBy(UPDATED_CREATED_BY_USER)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY_USER)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restMessageMockMvc
             .perform(
@@ -337,6 +397,10 @@ class MessageResourceIT {
         Message testMessage = messageList.get(messageList.size() - 1);
         assertThat(testMessage.getContent()).isEqualTo(UPDATED_CONTENT);
         assertThat(testMessage.getOwner()).isEqualTo(UPDATED_OWNER);
+        assertThat(testMessage.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY_USER);
+        assertThat(testMessage.getCreatedDate()).isNotNull();
+        assertThat(testMessage.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY_SYSTEM);
+        assertThat(testMessage.getLastModifiedDate()).isNotNull();
     }
 
     @Test

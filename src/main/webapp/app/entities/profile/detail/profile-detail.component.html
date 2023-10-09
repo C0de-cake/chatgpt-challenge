@@ -18,6 +18,22 @@
         <dd>
           <span jhiTranslate="{{ 'chatgptChallengeApp.UserSubscription.' + profile.subscription }}">{{ profile.subscription }}</span>
         </dd>
+        <dt><span jhiTranslate="chatgptChallengeApp.profile.createdBy">Created By</span></dt>
+        <dd>
+          <span>{{ profile.createdBy }}</span>
+        </dd>
+        <dt><span jhiTranslate="chatgptChallengeApp.profile.createdDate">Created Date</span></dt>
+        <dd>
+          <span>{{ profile.createdDate | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="chatgptChallengeApp.profile.lastModifiedBy">Last Modified By</span></dt>
+        <dd>
+          <span>{{ profile.lastModifiedBy }}</span>
+        </dd>
+        <dt><span jhiTranslate="chatgptChallengeApp.profile.lastModifiedDate">Last Modified Date</span></dt>
+        <dd>
+          <span>{{ profile.lastModifiedDate | formatMediumDatetime }}</span>
+        </dd>
         <dt><span jhiTranslate="chatgptChallengeApp.profile.user">User</span></dt>
         <dd>
           <span>{{ profile.user?.id }}</span>

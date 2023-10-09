@@ -1,11 +1,11 @@
-id;content;owner
-1;../fake-data/blob/hipster.txt;USER
-2;../fake-data/blob/hipster.txt;USER
-3;../fake-data/blob/hipster.txt;USER
-4;../fake-data/blob/hipster.txt;GPT
-5;../fake-data/blob/hipster.txt;GPT
-6;../fake-data/blob/hipster.txt;USER
-7;../fake-data/blob/hipster.txt;USER
-8;../fake-data/blob/hipster.txt;USER
-9;../fake-data/blob/hipster.txt;GPT
-10;../fake-data/blob/hipster.txt;GPT
+id;content;owner;created_by;created_date;last_modified_by;last_modified_date
+1;../fake-data/blob/hipster.txt;USER;Generic;2023-07-16T04:58:40;disintermediate too;2023-07-16T01:49:20
+2;../fake-data/blob/hipster.txt;USER;Mountain card Music;2023-07-16T08:08:52;candela World Movies;2023-07-16T07:22:28
+3;../fake-data/blob/hipster.txt;USER;interfaces connect;2023-07-16T18:49:51;Account;2023-07-16T12:38:13
+4;../fake-data/blob/hipster.txt;GPT;Investor Triathlon/Time East;2023-07-16T18:40:33;Regional yet Maserati;2023-07-16T07:51:30
+5;../fake-data/blob/hipster.txt;GPT;gray;2023-07-16T13:03:38;till;2023-07-16T18:20:10
+6;../fake-data/blob/hipster.txt;GPT;South Gasoline Rubber;2023-07-16T04:03:41;synergy loyalty;2023-07-16T18:03:37
+7;../fake-data/blob/hipster.txt;GPT;Southwest;2023-07-16T21:58:31;transmitting;2023-07-16T14:47:24
+8;../fake-data/blob/hipster.txt;GPT;dismal;2023-07-16T08:30:54;Convertible Sleek North;2023-07-16T23:41:46
+9;../fake-data/blob/hipster.txt;USER;schemas azure killer;2023-07-16T07:34:32;seize orange;2023-07-16T09:53:28
+10;../fake-data/blob/hipster.txt;USER;Neon solutions generate;2023-07-16T06:26:31;female;2023-07-16T23:50:31

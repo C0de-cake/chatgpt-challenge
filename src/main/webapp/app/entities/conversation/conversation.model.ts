@@ -1,9 +1,14 @@
+import dayjs from 'dayjs/esm';
 import { IProfile } from 'app/entities/profile/profile.model';
 
 export interface IConversation {
   id: number;
   name?: string | null;
   publicId?: string | null;
+  createdBy?: string | null;
+  createdDate?: dayjs.Dayjs | null;
+  lastModifiedBy?: string | null;
+  lastModifiedDate?: dayjs.Dayjs | null;
   profile?: Pick<IProfile, 'id'> | null;
 }
 

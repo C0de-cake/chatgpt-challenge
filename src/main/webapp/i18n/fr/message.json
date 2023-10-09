@@ -20,6 +20,10 @@
       "id": "ID",
       "content": "Content",
       "owner": "Owner",
+      "createdBy": "Created By",
+      "createdDate": "Created Date",
+      "lastModifiedBy": "Last Modified By",
+      "lastModifiedDate": "Last Modified Date",
       "conversation": "Conversation"
     }
   }

@@ -2,6 +2,7 @@ package fr.codecake.chatgptchallenge.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -13,6 +14,8 @@ import fr.codecake.chatgptchallenge.repository.ProfileRepository;
 import fr.codecake.chatgptchallenge.service.dto.ProfileDTO;
 import fr.codecake.chatgptchallenge.service.mapper.ProfileMapper;
 import jakarta.persistence.EntityManager;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -35,6 +38,21 @@ public class ProfileResourceIT {
 
     private static final UserSubscription DEFAULT_SUBSCRIPTION = UserSubscription.FREE;
     private static final UserSubscription UPDATED_SUBSCRIPTION = UserSubscription.PAID;
+
+    private static final String DEFAULT_CREATED_BY_USER = "user";
+    private static final String DEFAULT_CREATED_BY_SYSTEM = "system";
+    private static final String UPDATED_CREATED_BY = "system";
+
+    private static final Instant DEFAULT_CREATED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    private static final String DEFAULT_LAST_MODIFIED_BY_USER = "user";
+
+    private static final String DEFAULT_LAST_MODIFIED_BY_SYSTEM = "system";
+
+    private static final String UPDATED_LAST_MODIFIED_BY = "system";
+
+    private static final Instant DEFAULT_LAST_MODIFIED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_LAST_MODIFIED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/profiles";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -63,7 +81,12 @@ public class ProfileResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Profile createEntity(EntityManager em) {
-        Profile profile = new Profile().subscription(DEFAULT_SUBSCRIPTION);
+        Profile profile = new Profile()
+            .subscription(DEFAULT_SUBSCRIPTION)
+            .createdBy(DEFAULT_CREATED_BY_USER)
+            .createdDate(DEFAULT_CREATED_DATE)
+            .lastModifiedBy(DEFAULT_LAST_MODIFIED_BY_SYSTEM)
+            .lastModifiedDate(DEFAULT_LAST_MODIFIED_DATE);
         return profile;
     }
 
@@ -74,7 +97,12 @@ public class ProfileResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Profile createUpdatedEntity(EntityManager em) {
-        Profile profile = new Profile().subscription(UPDATED_SUBSCRIPTION);
+        Profile profile = new Profile()
+            .subscription(UPDATED_SUBSCRIPTION)
+            .createdBy(UPDATED_CREATED_BY)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
         return profile;
     }
 
@@ -103,6 +131,10 @@ public class ProfileResourceIT {
         assertThat(profileList).hasSize(databaseSizeBeforeCreate + 1);
         Profile testProfile = profileList.get(profileList.size() - 1);
         assertThat(testProfile.getSubscription()).isEqualTo(DEFAULT_SUBSCRIPTION);
+        assertThat(testProfile.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY_USER);
+        assertThat(testProfile.getCreatedDate()).isNotNull();
+        assertThat(testProfile.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY_USER);
+        assertThat(testProfile.getLastModifiedDate()).isNotNull();
     }
 
     @Test
@@ -141,7 +173,11 @@ public class ProfileResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(profile.getId().intValue())))
-            .andExpect(jsonPath("$.[*].subscription").value(hasItem(DEFAULT_SUBSCRIPTION.toString())));
+            .andExpect(jsonPath("$.[*].subscription").value(hasItem(DEFAULT_SUBSCRIPTION.toString())))
+            .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY_USER)))
+            .andExpect(jsonPath("$.[*].createdDate").exists())
+            .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY_USER)))
+            .andExpect(jsonPath("$.[*].lastModifiedDate").exists());
     }
 
     @Test
@@ -156,7 +192,11 @@ public class ProfileResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(profile.getId().intValue()))
-            .andExpect(jsonPath("$.subscription").value(DEFAULT_SUBSCRIPTION.toString()));
+            .andExpect(jsonPath("$.subscription").value(DEFAULT_SUBSCRIPTION.toString()))
+            .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY_USER))
+            .andExpect(jsonPath("$.createdDate").exists())
+            .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY_USER))
+            .andExpect(jsonPath("$.lastModifiedDate").exists());
     }
 
     @Test
@@ -178,7 +218,12 @@ public class ProfileResourceIT {
         Profile updatedProfile = profileRepository.findById(profile.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedProfile are not directly saved in db
         em.detach(updatedProfile);
-        updatedProfile.subscription(UPDATED_SUBSCRIPTION);
+        updatedProfile
+            .subscription(UPDATED_SUBSCRIPTION)
+            .createdBy(UPDATED_CREATED_BY)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
         ProfileDTO profileDTO = profileMapper.toDto(updatedProfile);
 
         restProfileMockMvc
@@ -195,6 +240,10 @@ public class ProfileResourceIT {
         assertThat(profileList).hasSize(databaseSizeBeforeUpdate);
         Profile testProfile = profileList.get(profileList.size() - 1);
         assertThat(testProfile.getSubscription()).isEqualTo(UPDATED_SUBSCRIPTION);
+        assertThat(testProfile.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
+        assertThat(testProfile.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
+        assertThat(testProfile.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
+        assertThat(testProfile.getLastModifiedDate()).isNotNull();
     }
 
     @Test
@@ -281,7 +330,7 @@ public class ProfileResourceIT {
         Profile partialUpdatedProfile = new Profile();
         partialUpdatedProfile.setId(profile.getId());
 
-        partialUpdatedProfile.subscription(UPDATED_SUBSCRIPTION);
+        partialUpdatedProfile.createdDate(UPDATED_CREATED_DATE).lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restProfileMockMvc
             .perform(
@@ -296,7 +345,11 @@ public class ProfileResourceIT {
         List<Profile> profileList = profileRepository.findAll();
         assertThat(profileList).hasSize(databaseSizeBeforeUpdate);
         Profile testProfile = profileList.get(profileList.size() - 1);
-        assertThat(testProfile.getSubscription()).isEqualTo(UPDATED_SUBSCRIPTION);
+        assertThat(testProfile.getSubscription()).isEqualTo(DEFAULT_SUBSCRIPTION);
+        assertThat(testProfile.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY_USER);
+        assertThat(testProfile.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
+        assertThat(testProfile.getLastModifiedBy()).isEqualTo(DEFAULT_CREATED_BY_SYSTEM);
+        assertThat(testProfile.getLastModifiedDate()).isNotNull();
     }
 
     @Test
@@ -311,7 +364,12 @@ public class ProfileResourceIT {
         Profile partialUpdatedProfile = new Profile();
         partialUpdatedProfile.setId(profile.getId());
 
-        partialUpdatedProfile.subscription(UPDATED_SUBSCRIPTION);
+        partialUpdatedProfile
+            .subscription(UPDATED_SUBSCRIPTION)
+            .createdBy(UPDATED_CREATED_BY)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
 
         restProfileMockMvc
             .perform(
@@ -327,6 +385,10 @@ public class ProfileResourceIT {
         assertThat(profileList).hasSize(databaseSizeBeforeUpdate);
         Profile testProfile = profileList.get(profileList.size() - 1);
         assertThat(testProfile.getSubscription()).isEqualTo(UPDATED_SUBSCRIPTION);
+        assertThat(testProfile.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
+        assertThat(testProfile.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
+        assertThat(testProfile.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
+        assertThat(testProfile.getLastModifiedDate()).isNotNull();
     }
 
     @Test

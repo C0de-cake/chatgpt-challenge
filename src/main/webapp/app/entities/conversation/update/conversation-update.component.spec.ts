@@ -50,10 +50,10 @@ describe('Conversation Management Update Component', () => {
   describe('ngOnInit', () => {
     it('Should call Profile query and add missing value', () => {
       const conversation: IConversation = { id: 456 };
-      const profile: IProfile = { id: 7142 };
+      const profile: IProfile = { id: 31037 };
       conversation.profile = profile;
 
-      const profileCollection: IProfile[] = [{ id: 18780 }];
+      const profileCollection: IProfile[] = [{ id: 13324 }];
       jest.spyOn(profileService, 'query').mockReturnValue(of(new HttpResponse({ body: profileCollection })));
       const additionalProfiles = [profile];
       const expectedCollection: IProfile[] = [...additionalProfiles, ...profileCollection];
@@ -72,7 +72,7 @@ describe('Conversation Management Update Component', () => {
 
     it('Should update editForm', () => {
       const conversation: IConversation = { id: 456 };
-      const profile: IProfile = { id: 8708 };
+      const profile: IProfile = { id: 18813 };
       conversation.profile = profile;
 
       activatedRoute.data = of({ conversation });

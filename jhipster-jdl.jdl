@@ -1,15 +1,27 @@
 entity Conversation {
 	name String,
-    publicId UUID
+    publicId UUID,
+    createdBy String,
+    createdDate Instant,
+    lastModifiedBy String,
+    lastModifiedDate Instant
 }
 
 entity Message {
 	content TextBlob,
-    owner Owner
+    owner Owner,
+    createdBy String,
+    createdDate Instant,
+    lastModifiedBy String,
+    lastModifiedDate Instant
 }
 
 entity Profile {
-    subscription UserSubscription
+    subscription UserSubscription,
+    createdBy String,
+    createdDate Instant,
+    lastModifiedBy String,
+    lastModifiedDate Instant
 }
 
 enum Owner {

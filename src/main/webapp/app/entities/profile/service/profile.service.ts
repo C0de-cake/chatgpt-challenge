@@ -2,12 +2,27 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+import { map } from 'rxjs/operators';
+
+import dayjs from 'dayjs/esm';
+
 import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
 import { IProfile, NewProfile } from '../profile.model';
 
 export type PartialUpdateProfile = Partial<IProfile> & Pick<IProfile, 'id'>;
+
+type RestOf<T extends IProfile | NewProfile> = Omit<T, 'createdDate' | 'lastModifiedDate'> & {
+  createdDate?: string | null;
+  lastModifiedDate?: string | null;
+};
+
+export type RestProfile = RestOf<IProfile>;
+
+export type NewRestProfile = RestOf<NewProfile>;
+
+export type PartialUpdateRestProfile = RestOf<PartialUpdateProfile>;
 
 export type EntityResponseType = HttpResponse<IProfile>;
 export type EntityArrayResponseType = HttpResponse<IProfile[]>;
@@ -19,24 +34,37 @@ export class ProfileService {
   constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {}
 
   create(profile: NewProfile): Observable<EntityResponseType> {
-    return this.http.post<IProfile>(this.resourceUrl, profile, { observe: 'response' });
+    const copy = this.convertDateFromClient(profile);
+    return this.http
+      .post<RestProfile>(this.resourceUrl, copy, { observe: 'response' })
+      .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
   update(profile: IProfile): Observable<EntityResponseType> {
-    return this.http.put<IProfile>(`${this.resourceUrl}/${this.getProfileIdentifier(profile)}`, profile, { observe: 'response' });
+    const copy = this.convertDateFromClient(profile);
+    return this.http
+      .put<RestProfile>(`${this.resourceUrl}/${this.getProfileIdentifier(profile)}`, copy, { observe: 'response' })
+      .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
   partialUpdate(profile: PartialUpdateProfile): Observable<EntityResponseType> {
-    return this.http.patch<IProfile>(`${this.resourceUrl}/${this.getProfileIdentifier(profile)}`, profile, { observe: 'response' });
+    const copy = this.convertDateFromClient(profile);
+    return this.http
+      .patch<RestProfile>(`${this.resourceUrl}/${this.getProfileIdentifier(profile)}`, copy, { observe: 'response' })
+      .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
   find(id: number): Observable<EntityResponseType> {
-    return this.http.get<IProfile>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+    return this.http
+      .get<RestProfile>(`${this.resourceUrl}/${id}`, { observe: 'response' })
+      .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {
     const options = createRequestOption(req);
-    return this.http.get<IProfile[]>(this.resourceUrl, { params: options, observe: 'response' });
+    return this.http
+      .get<RestProfile[]>(this.resourceUrl, { params: options, observe: 'response' })
+      .pipe(map(res => this.convertResponseArrayFromServer(res)));
   }
 
   delete(id: number): Observable<HttpResponse<{}>> {
@@ -69,5 +97,33 @@ export class ProfileService {
       return [...profilesToAdd, ...profileCollection];
     }
     return profileCollection;
+  }
+
+  protected convertDateFromClient<T extends IProfile | NewProfile | PartialUpdateProfile>(profile: T): RestOf<T> {
+    return {
+      ...profile,
+      createdDate: profile.createdDate?.toJSON() ?? null,
+      lastModifiedDate: profile.lastModifiedDate?.toJSON() ?? null,
+    };
+  }
+
+  protected convertDateFromServer(restProfile: RestProfile): IProfile {
+    return {
+      ...restProfile,
+      createdDate: restProfile.createdDate ? dayjs(restProfile.createdDate) : undefined,
+      lastModifiedDate: restProfile.lastModifiedDate ? dayjs(restProfile.lastModifiedDate) : undefined,
+    };
+  }
+
+  protected convertResponseFromServer(res: HttpResponse<RestProfile>): HttpResponse<IProfile> {
+    return res.clone({
+      body: res.body ? this.convertDateFromServer(res.body) : null,
+    });
+  }
+
+  protected convertResponseArrayFromServer(res: HttpResponse<RestProfile[]>): HttpResponse<IProfile[]> {
+    return res.clone({
+      body: res.body ? res.body.map(item => this.convertDateFromServer(item)) : null,
+    });
   }
 }

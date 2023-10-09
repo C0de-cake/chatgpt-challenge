@@ -22,6 +22,22 @@
         <dd>
           <span>{{ conversation.publicId }}</span>
         </dd>
+        <dt><span jhiTranslate="chatgptChallengeApp.conversation.createdBy">Created By</span></dt>
+        <dd>
+          <span>{{ conversation.createdBy }}</span>
+        </dd>
+        <dt><span jhiTranslate="chatgptChallengeApp.conversation.createdDate">Created Date</span></dt>
+        <dd>
+          <span>{{ conversation.createdDate | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="chatgptChallengeApp.conversation.lastModifiedBy">Last Modified By</span></dt>
+        <dd>
+          <span>{{ conversation.lastModifiedBy }}</span>
+        </dd>
+        <dt><span jhiTranslate="chatgptChallengeApp.conversation.lastModifiedDate">Last Modified Date</span></dt>
+        <dd>
+          <span>{{ conversation.lastModifiedDate | formatMediumDatetime }}</span>
+        </dd>
         <dt><span jhiTranslate="chatgptChallengeApp.conversation.profile">Profile</span></dt>
         <dd>
           <div *ngIf="conversation.profile">

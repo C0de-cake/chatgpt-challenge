@@ -44,6 +44,30 @@
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
+          <th scope="col" jhiSortBy="createdBy">
+            <div class="d-flex">
+              <span jhiTranslate="chatgptChallengeApp.profile.createdBy">Created By</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="createdDate">
+            <div class="d-flex">
+              <span jhiTranslate="chatgptChallengeApp.profile.createdDate">Created Date</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="lastModifiedBy">
+            <div class="d-flex">
+              <span jhiTranslate="chatgptChallengeApp.profile.lastModifiedBy">Last Modified By</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="lastModifiedDate">
+            <div class="d-flex">
+              <span jhiTranslate="chatgptChallengeApp.profile.lastModifiedDate">Last Modified Date</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
           <th scope="col" jhiSortBy="user.id">
             <div class="d-flex">
               <span jhiTranslate="chatgptChallengeApp.profile.user">User</span>
@@ -59,6 +83,10 @@
             <a [routerLink]="['/profile', profile.id, 'view']">{{ profile.id }}</a>
           </td>
           <td jhiTranslate="{{ 'chatgptChallengeApp.UserSubscription.' + profile.subscription }}">{{ profile.subscription }}</td>
+          <td>{{ profile.createdBy }}</td>
+          <td>{{ profile.createdDate | formatMediumDatetime }}</td>
+          <td>{{ profile.lastModifiedBy }}</td>
+          <td>{{ profile.lastModifiedDate | formatMediumDatetime }}</td>
           <td>
             {{ profile.user?.id }}
           </td>

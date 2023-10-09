@@ -50,6 +50,30 @@
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
+          <th scope="col" jhiSortBy="createdBy">
+            <div class="d-flex">
+              <span jhiTranslate="chatgptChallengeApp.message.createdBy">Created By</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="createdDate">
+            <div class="d-flex">
+              <span jhiTranslate="chatgptChallengeApp.message.createdDate">Created Date</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="lastModifiedBy">
+            <div class="d-flex">
+              <span jhiTranslate="chatgptChallengeApp.message.lastModifiedBy">Last Modified By</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="lastModifiedDate">
+            <div class="d-flex">
+              <span jhiTranslate="chatgptChallengeApp.message.lastModifiedDate">Last Modified Date</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
           <th scope="col" jhiSortBy="conversation.id">
             <div class="d-flex">
               <span jhiTranslate="chatgptChallengeApp.message.conversation">Conversation</span>
@@ -66,6 +90,10 @@
           </td>
           <td>{{ message.content }}</td>
           <td jhiTranslate="{{ 'chatgptChallengeApp.Owner.' + message.owner }}">{{ message.owner }}</td>
+          <td>{{ message.createdBy }}</td>
+          <td>{{ message.createdDate | formatMediumDatetime }}</td>
+          <td>{{ message.lastModifiedBy }}</td>
+          <td>{{ message.lastModifiedDate | formatMediumDatetime }}</td>
           <td>
             <div *ngIf="message.conversation">
               <a [routerLink]="['/conversation', message.conversation.id, 'view']">{{ message.conversation.id }}</a>

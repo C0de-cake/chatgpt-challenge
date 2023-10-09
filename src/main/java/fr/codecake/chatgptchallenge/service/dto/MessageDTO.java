@@ -3,6 +3,7 @@ package fr.codecake.chatgptchallenge.service.dto;
 import fr.codecake.chatgptchallenge.domain.enumeration.Owner;
 import jakarta.persistence.Lob;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -17,6 +18,14 @@ public class MessageDTO implements Serializable {
     private String content;
 
     private Owner owner;
+
+    private String createdBy;
+
+    private Instant createdDate;
+
+    private String lastModifiedBy;
+
+    private Instant lastModifiedDate;
 
     private ConversationDTO conversation;
 
@@ -42,6 +51,38 @@ public class MessageDTO implements Serializable {
 
     public void setOwner(Owner owner) {
         this.owner = owner;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Instant getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Instant getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Instant lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public ConversationDTO getConversation() {
@@ -80,6 +121,10 @@ public class MessageDTO implements Serializable {
             "id=" + getId() +
             ", content='" + getContent() + "'" +
             ", owner='" + getOwner() + "'" +
+            ", createdBy='" + getCreatedBy() + "'" +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastModifiedBy='" + getLastModifiedBy() + "'" +
+            ", lastModifiedDate='" + getLastModifiedDate() + "'" +
             ", conversation=" + getConversation() +
             "}";
     }

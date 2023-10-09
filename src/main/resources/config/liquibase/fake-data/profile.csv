@@ -1,11 +1,11 @@
-id;subscription
-1;FREE
-2;PAID
-3;FREE
-4;PAID
-5;PAID
-6;PAID
-7;FREE
-8;PAID
-9;FREE
-10;FREE
+id;subscription;created_by;created_date;last_modified_by;last_modified_date
+1;FREE;Industrial circuit Southwest;2023-07-27T19:30:34;East;2023-07-27T13:29:18
+2;FREE;Car;2023-07-28T00:31:22;steradian;2023-07-27T21:14:09
+3;PAID;Engineer Buckinghamshire;2023-07-27T16:45:45;Account reassuringly transitional;2023-07-27T13:40:20
+4;FREE;Rican afterwards;2023-07-27T10:14:45;Jewelery;2023-07-27T08:45:59
+5;PAID;Tricycle yellow;2023-07-27T21:05:01;enhance male;2023-07-27T13:14:01
+6;FREE;Folk;2023-07-27T21:20:32;Ankunding North National;2023-07-27T16:27:25
+7;PAID;application Engineer;2023-07-27T23:04:57;interactive deliver whose;2023-07-27T06:23:28
+8;FREE;Bicycle North odit;2023-07-28T03:05:04;maroon reboot Myanmar;2023-07-27T22:05:25
+9;PAID;West;2023-07-27T07:08:35;collaborative Bicycle;2023-07-27T12:26:53
+10;FREE;busily;2023-07-27T16:25:27;Convertible District homogeneous;2023-07-27T22:04:39

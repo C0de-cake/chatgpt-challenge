@@ -160,11 +160,25 @@ describe('Conversation e2e test', () => {
     });
 
     it('should create an instance of Conversation', () => {
-      cy.get(`[data-cy="name"]`).type('whether');
-      cy.get(`[data-cy="name"]`).should('have.value', 'whether');
+      cy.get(`[data-cy="name"]`).type('hence incidentally');
+      cy.get(`[data-cy="name"]`).should('have.value', 'hence incidentally');
 
-      cy.get(`[data-cy="publicId"]`).type('1cd34da1-605c-41c2-838b-d011f265b4a3');
-      cy.get(`[data-cy="publicId"]`).invoke('val').should('match', new RegExp('1cd34da1-605c-41c2-838b-d011f265b4a3'));
+      cy.get(`[data-cy="publicId"]`).type('e7b34a40-ed1c-4d34-8da1-605c1c238bd0');
+      cy.get(`[data-cy="publicId"]`).invoke('val').should('match', new RegExp('e7b34a40-ed1c-4d34-8da1-605c1c238bd0'));
+
+      cy.get(`[data-cy="createdBy"]`).type('chasm');
+      cy.get(`[data-cy="createdBy"]`).should('have.value', 'chasm');
+
+      cy.get(`[data-cy="createdDate"]`).type('2023-07-16T16:30');
+      cy.get(`[data-cy="createdDate"]`).blur();
+      cy.get(`[data-cy="createdDate"]`).should('have.value', '2023-07-16T16:30');
+
+      cy.get(`[data-cy="lastModifiedBy"]`).type('female Manager');
+      cy.get(`[data-cy="lastModifiedBy"]`).should('have.value', 'female Manager');
+
+      cy.get(`[data-cy="lastModifiedDate"]`).type('2023-07-16T23:43');
+      cy.get(`[data-cy="lastModifiedDate"]`).blur();
+      cy.get(`[data-cy="lastModifiedDate"]`).should('have.value', '2023-07-16T23:43');
 
       cy.get(entityCreateSaveButtonSelector).click();
 
