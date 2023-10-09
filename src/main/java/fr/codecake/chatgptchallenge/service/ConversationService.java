@@ -149,6 +149,11 @@ public class ConversationService {
         conversationRepository.deleteById(id);
     }
 
+    public void deleteByPublicId(String publicId, String login) {
+        log.debug("Request to delete Conversation : {} / {}", publicId, login);
+        conversationRepository.deleteByPublicIdAndProfileUserLogin(UUID.fromString(publicId), login);
+    }
+
     public ConversationDTO saveWithMessages(ConversationDTO conversationDTO) {
         Conversation conversationToSave = conversationMapper.toEntityWithoutMessages(conversationDTO);
 

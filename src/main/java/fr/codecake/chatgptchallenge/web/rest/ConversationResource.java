@@ -241,9 +241,16 @@ public class ConversationResource {
 
         Optional<ConversationDTO> result = conversationService.partialUpdateByPublicId(conversationDTO);
 
-        return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, conversationDTO.getPublicId().toString())
-        );
+        return ResponseUtil.wrapOrNotFound(result);
+    }
+
+    @DeleteMapping("/conversations/for-connected-user/{public-id}")
+    public ResponseEntity<Void> deleteConversation(@PathVariable(name = "public-id") String publicId) {
+        log.debug("REST request to delete Conversation : {}", publicId);
+        String currentLogin = SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+
+        conversationService.deleteByPublicId(publicId, currentLogin);
+        return ResponseEntity.noContent().build();
     }
 }

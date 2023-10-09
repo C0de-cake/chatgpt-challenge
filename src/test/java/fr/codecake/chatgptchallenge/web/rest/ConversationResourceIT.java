@@ -626,4 +626,28 @@ class ConversationResourceIT {
         assertThat(testConversation.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY_SYSTEM);
         assertThat(testConversation.getLastModifiedDate()).isNotNull();
     }
+
+    @Test
+    @Transactional
+    @WithMockUser(authorities = "USER", username = LOGIN_USER)
+    void deleteConversationForConnectedUser() throws Exception {
+        // Initialize the database
+        Profile profile = createUserAndProfile(LOGIN_USER);
+        profileRepository.saveAndFlush(profile);
+
+        conversation.setProfile(profile);
+        conversationRepository.saveAndFlush(conversation);
+
+        int databaseSizeBeforeDelete = conversationRepository.findAll().size();
+
+        // Delete the conversation
+        restConversationMockMvc
+            .perform(delete(ENTITY_API_URL + "/for-connected-user/{public-id}", conversation.getPublicId())
+                .with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNoContent());
+
+        // Validate the database contains one less item
+        List<Conversation> conversationList = conversationRepository.findAll();
+        assertThat(conversationList).hasSize(databaseSizeBeforeDelete - 1);
+    }
 }

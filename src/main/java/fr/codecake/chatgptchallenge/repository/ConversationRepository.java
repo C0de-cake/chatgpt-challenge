@@ -23,4 +23,5 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
     boolean existsConversationByPublicIdAndProfileUserLogin(UUID publicId, String login);
 
     Page<Conversation> findAllByProfileId(Long profileId, Pageable pageable);
+    void deleteByPublicIdAndProfileUserLogin(UUID publicId, String login);
 }
