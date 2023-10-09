@@ -1,10 +1,16 @@
 package fr.codecake.chatgptchallenge.service;
 
 import fr.codecake.chatgptchallenge.domain.Profile;
+import fr.codecake.chatgptchallenge.domain.Profile_;
+import fr.codecake.chatgptchallenge.domain.User;
+import fr.codecake.chatgptchallenge.domain.enumeration.UserSubscription;
 import fr.codecake.chatgptchallenge.repository.ProfileRepository;
 import fr.codecake.chatgptchallenge.service.dto.ProfileDTO;
+import fr.codecake.chatgptchallenge.service.dto.UserDTO;
 import fr.codecake.chatgptchallenge.service.mapper.ProfileMapper;
+
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -120,5 +126,13 @@ public class ProfileService {
     public void delete(Long id) {
         log.debug("Request to delete Profile : {}", id);
         profileRepository.deleteById(id);
+    }
+
+    public Profile createForUser(User user) {
+        log.debug("Request to save Profile for user : {}", user.getLogin());
+        Profile profile = new Profile();
+        profile.setUser(user);
+        profile.setSubscription(UserSubscription.FREE);
+        return profileRepository.save(profile);
     }
 }

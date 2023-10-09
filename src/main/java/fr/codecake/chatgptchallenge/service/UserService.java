@@ -37,11 +37,16 @@ public class UserService {
     private final AuthorityRepository authorityRepository;
 
     private final CacheManager cacheManager;
+    private final ProfileService profileService;
 
-    public UserService(UserRepository userRepository, AuthorityRepository authorityRepository, CacheManager cacheManager) {
+    public UserService(UserRepository userRepository,
+                       AuthorityRepository authorityRepository,
+                       CacheManager cacheManager,
+                       ProfileService profileService) {
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
+        this.profileService = profileService;
     }
 
     /**
@@ -131,6 +136,7 @@ public class UserService {
         } else {
             log.debug("Saving user '{}' in local database", user.getLogin());
             userRepository.save(user);
+            profileService.createForUser(user);
             this.clearUserCaches(user);
         }
         return user;
