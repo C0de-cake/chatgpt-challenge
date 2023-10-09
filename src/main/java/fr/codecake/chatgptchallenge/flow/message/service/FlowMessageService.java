@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,7 @@ public class FlowMessageService {
         FlowMessageResponseDTO flowMessageResponseDTO = new FlowMessageResponseDTO();
         if (flowMessageQueryDTO.getNewConversation()) {
             ConversationDTO unsavedConversationDTO = new ConversationDTO();
-            unsavedConversationDTO.setName("Conversation-1");
+            unsavedConversationDTO.setName(UUID.randomUUID().toString().substring(0, 6));
             final ConversationDTO savedConversationDTO = conversationService.save(unsavedConversationDTO);
 
             MessageDTO messageFromUserDTO = new MessageDTO();
@@ -62,7 +63,13 @@ public class FlowMessageService {
 
             ConversationDTO saveConversation = conversationService.saveWithMessages(savedConversationDTO);
 
-            flowMessageResponseDTO.setContent(newMessagesDTO.stream().findFirst().get().getContent());
+            MessageDTO messageDTO = newMessagesDTO.stream()
+                .filter(messageDTOToFilter -> messageDTOToFilter.getOwner().equals(Owner.GPT))
+                .findFirst()
+                .orElseThrow(() -> new OpenAIException(format("No message present in the DTO from GPT" +
+                    " for the conversation %s and the message %s", saveConversation.getId(), flowMessageQueryDTO)));
+
+            flowMessageResponseDTO.setContent(messageDTO.getContent());
             flowMessageResponseDTO.setConversationPublicId(saveConversation.getId());
         } else {
             Optional<ConversationDTO> conversationPresent = conversationService.findOne(flowMessageQueryDTO.getConversationPublicId());
