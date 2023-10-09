@@ -17,7 +17,7 @@
                   *ngFor="let conversation of conversationsByMonth.value | orderByImpure: '-createdDate';
                    trackBy: trackId; index as index;"
                   class="btn btn-dark my-1 w-100 text-start d-flex align-items-center">
-            <fa-icon icon="message" class="pe-3"></fa-icon>
+            <fa-icon icon="message" class="pe-3" (click)="onSelect(conversation)"></fa-icon>
             <div class="btn-conversation d-flex align-items-center justify-content-between flex-grow-1">
               <div class="btn-conversation" (click)="onSelect(conversation)">
                 <span *ngIf="!isConversationInEditMode(conversation.publicId)" data-cy="name">{{conversation.name}}</span>
