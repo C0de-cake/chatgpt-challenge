@@ -103,7 +103,7 @@ public class ProfileService {
     /**
      * Get one profile by user email.
      *
-     * @param email the email of the profile to search for.
+     * @param login the email of the profile to search for.
      * @return the entity.
      */
     @Transactional(readOnly = true)

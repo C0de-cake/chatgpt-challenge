@@ -13,8 +13,8 @@ import {
 describe('Message e2e test', () => {
   const messagePageUrl = '/message';
   const messagePageUrlPattern = new RegExp('/message(\\?.*)?$');
-  const username = Cypress.env('E2E_USERNAME') ?? 'user';
-  const password = Cypress.env('E2E_PASSWORD') ?? 'user';
+  const username = Cypress.env('E2E_ADMIN_USERNAME') ?? 'user';
+  const password = Cypress.env('E2E_ADMIN_PASSWORD') ?? 'user';
   const messageSample = {};
 
   let message;
