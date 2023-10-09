@@ -30,7 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 @WithMockUser(authorities = AuthoritiesConstants.ADMIN)
 @IntegrationTest
-class UserResourceIT {
+public class UserResourceIT {
 
     private static final String DEFAULT_LOGIN = "johndoe";
 

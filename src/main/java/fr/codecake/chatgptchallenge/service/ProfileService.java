@@ -101,6 +101,18 @@ public class ProfileService {
     }
 
     /**
+     * Get one profile by user email.
+     *
+     * @param email the email of the profile to search for.
+     * @return the entity.
+     */
+    @Transactional(readOnly = true)
+    public Optional<ProfileDTO> findOneByUserEmail(String login) {
+        log.debug("Request to get Profile by login : {}", login);
+        return profileRepository.findOneByUserLogin(login).map(profileMapper::toDto);
+    }
+
+    /**
      * Delete the profile by id.
      *
      * @param id the id of the entity.

@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-class ProfileResourceIT {
+public class ProfileResourceIT {
 
     private static final UserSubscription DEFAULT_SUBSCRIPTION = UserSubscription.FREE;
     private static final UserSubscription UPDATED_SUBSCRIPTION = UserSubscription.PAID;

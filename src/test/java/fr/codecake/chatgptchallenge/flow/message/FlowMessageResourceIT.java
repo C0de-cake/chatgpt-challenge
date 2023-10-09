@@ -3,6 +3,8 @@ package fr.codecake.chatgptchallenge.flow.message;
 import fr.codecake.chatgptchallenge.IntegrationTest;
 import fr.codecake.chatgptchallenge.domain.Conversation;
 import fr.codecake.chatgptchallenge.domain.Message;
+import fr.codecake.chatgptchallenge.domain.Profile;
+import fr.codecake.chatgptchallenge.domain.User;
 import fr.codecake.chatgptchallenge.domain.enumeration.Owner;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.FlowMessageQueryDTO;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.enums.GPTModel;
@@ -13,8 +15,13 @@ import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTMes
 import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTUsageResponseDTO;
 import fr.codecake.chatgptchallenge.repository.ConversationRepository;
 import fr.codecake.chatgptchallenge.repository.MessageRepository;
+import fr.codecake.chatgptchallenge.repository.ProfileRepository;
+import fr.codecake.chatgptchallenge.repository.UserRepository;
+import fr.codecake.chatgptchallenge.web.rest.ProfileResourceIT;
 import fr.codecake.chatgptchallenge.web.rest.TestUtil;
+import fr.codecake.chatgptchallenge.web.rest.UserResourceIT;
 import jakarta.persistence.EntityManager;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +107,12 @@ class FlowMessageResourceIT {
 
     private final String baseUrl;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ProfileRepository profileRepository;
+
     FlowMessageResourceIT(@Value("${application.openai.url}") String baseUrl) {
         this.baseUrl = baseUrl;
     }
@@ -172,7 +185,10 @@ class FlowMessageResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(authorities = "USER", username = "toto")
     public void shouldHandleMessageForANewConversation() throws Exception {
+        Profile profile = createUserAndProfile();
+
         fakeGPTAPICall(DEFAULT_CONTENT_FROM_GPT);
 
         List<Conversation> noConversationsPresent = conversationRepository.findAll();
@@ -201,6 +217,8 @@ class FlowMessageResourceIT {
         assertThat(conversation.getPublicId()).isNotNull();
         assertThat(conversation.getName()).isNotNull();
         assertThat(conversation.getMessages().size()).isEqualTo(2);
+        assertThat(conversation.getProfile()).isNotNull();
+        assertThat(conversation.getProfile().getId()).isEqualTo(profile.getId());
 
         Optional<Message> messageFromUser = conversation.getMessages()
             .stream().filter(message -> message.getOwner().equals(Owner.USER)).findFirst();
@@ -216,9 +234,23 @@ class FlowMessageResourceIT {
         assertThat(messageFromGPT.orElseThrow().getId()).isNotNull();
     }
 
+    @NotNull
+    private Profile createUserAndProfile() {
+        User user = UserResourceIT.createEntity(em);
+        user.setLogin("toto");
+        userRepository.saveAndFlush(user);
+
+        Profile profile = ProfileResourceIT.createEntity(em);
+        profile.setUser(user);
+        profileRepository.saveAndFlush(profile);
+        return profile;
+    }
+
     @Test
     @Transactional
+    @WithMockUser(authorities = "USER", username = "toto")
     public void shouldHandleMessageForAnExistingConversation() throws Exception {
+        Profile profile = createUserAndProfile();
         fakeGPTAPICall(DEFAULT_CONTENT_EXISTING_CONVERSATION_FROM_GPT);
         String newMessageContent = "Can you explain what's spring boot in one short sentence ?";
 
@@ -233,6 +265,7 @@ class FlowMessageResourceIT {
         messageRepository.saveAll(List.of(messageFromUser, messageFromGPT));
 
         Conversation conversation = new Conversation();
+        conversation.setProfile(profile);
         conversation.setName(UUID.randomUUID().toString().substring(0, 6));
         conversation.setPublicId(UUID.randomUUID());
 

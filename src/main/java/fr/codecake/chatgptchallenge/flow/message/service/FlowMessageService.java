@@ -8,9 +8,11 @@ import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTCha
 import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTChoiceResponseDTO;
 import fr.codecake.chatgptchallenge.flow.message.service.exception.ConversationNotExistException;
 import fr.codecake.chatgptchallenge.flow.message.service.exception.OpenAIException;
+import fr.codecake.chatgptchallenge.service.ConnectedUserService;
 import fr.codecake.chatgptchallenge.service.ConversationService;
 import fr.codecake.chatgptchallenge.service.dto.ConversationDTO;
 import fr.codecake.chatgptchallenge.service.dto.MessageDTO;
+import fr.codecake.chatgptchallenge.service.dto.ProfileDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,33 +27,42 @@ public class FlowMessageService {
 
     private final GPTService gptService;
     private final ConversationService conversationService;
+    private final ConnectedUserService connectedUserService;
 
     public FlowMessageService(GPTService gptService,
-                              ConversationService conversationService) {
+                              ConversationService conversationService,
+                              ConnectedUserService connectedUserService) {
         this.gptService = gptService;
         this.conversationService = conversationService;
+        this.connectedUserService = connectedUserService;
     }
 
 
     @Transactional(propagation = Propagation.REQUIRED)
     public FlowMessageResponseDTO sendMessage(FlowMessageQueryDTO flowMessageQueryDTO) throws OpenAIException, ConversationNotExistException {
+        ProfileDTO profileConnectedUser = connectedUserService.getProfileConnectedUser();
+
         FlowMessageResponseDTO flowMessageResponseDTO = new FlowMessageResponseDTO();
         if (flowMessageQueryDTO.getNewConversation()) {
-            handleNewMessage(flowMessageQueryDTO, flowMessageResponseDTO, new ConversationDTO());
+            handleNewMessage(flowMessageQueryDTO, flowMessageResponseDTO, new ConversationDTO(), profileConnectedUser);
         } else {
             ConversationDTO existingConversation =
-                conversationService.findOneByPublicId(flowMessageQueryDTO.getConversationPublicId())
-                    .orElseThrow(() -> new ConversationNotExistException(format("Conversation with the following public id doesn't exist %s ",
-                        flowMessageQueryDTO.getConversationPublicId())));
+                conversationService.findOneByPublicIdAndProfileId(
+                        flowMessageQueryDTO.getConversationPublicId(), profileConnectedUser.getId())
+                    .orElseThrow(() -> new ConversationNotExistException(format("Conversation with the following public id and profile id doesn't exist %s, %s ",
+                        flowMessageQueryDTO.getConversationPublicId(), profileConnectedUser.getId())));
 
-            handleNewMessage(flowMessageQueryDTO, flowMessageResponseDTO, existingConversation);
+            handleNewMessage(flowMessageQueryDTO, flowMessageResponseDTO, existingConversation, profileConnectedUser);
         }
         return flowMessageResponseDTO;
     }
 
-    private void handleNewMessage(FlowMessageQueryDTO flowMessageQueryDTO, FlowMessageResponseDTO flowMessageResponseDTO, ConversationDTO conversationDTO) {
+    private void handleNewMessage(FlowMessageQueryDTO flowMessageQueryDTO,
+                                  FlowMessageResponseDTO flowMessageResponseDTO,
+                                  ConversationDTO conversationDTO, ProfileDTO profileDTO) {
         if (conversationDTO.getId() == null) {
             conversationDTO.setName(UUID.randomUUID().toString().substring(0, 6));
+            conversationDTO.setProfile(profileDTO);
             conversationDTO = conversationService.save(conversationDTO);
         }
 
