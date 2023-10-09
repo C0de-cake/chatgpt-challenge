@@ -1,4 +1,21 @@
+logging:
+  level:
+    ROOT: INFO
+    tech.jhipster: INFO
+    fr.codecake.chatgptchallenge: INFO
+
+management:
+  prometheus:
+    metrics:
+      export:
+        enabled: false
+
 spring:
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:postgresql://${POSTGRESQL_ADDON_HOST}:${POSTGRESQL_ADDON_PORT}/${POSTGRESQL_ADDON_DB}?useUnicode=true&characterEncoding=utf8&useSSL=false
@@ -14,10 +31,10 @@ spring:
   security:
     oauth2:
       client:
+        provider:
+          oidc:
+            issuer-uri: ${SSO_PROVIDER_OIDC_ISSUER_URI}
         registration:
-          provider:
-            oidc:
-              issuer-uri: ${SSO_PROVIDER_OIDC_ISSUER_URI}
           oidc:
             client-id: ${SSO_CLIENT_ID}
             client-secret: ${SSO_CLIENT_SECRET}
