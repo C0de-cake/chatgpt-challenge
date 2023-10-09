@@ -2,8 +2,7 @@ name: Release
 on:
   push:
     branches:
-      - master
-      - configure-deploy-cloud
+      - main
 jobs:
   pipeline:
     name: Deploy pipeline
