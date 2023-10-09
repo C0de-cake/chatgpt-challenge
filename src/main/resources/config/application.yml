@@ -166,6 +166,8 @@ spring:
             client-id: web_app
             client-secret: web_app
             scope: openid, profile, email, offline_access # last one for refresh tokens
+  jackson:
+    default-property-inclusion: non_null
 
 server:
   servlet:
@@ -227,4 +229,7 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+ application:
+   openai:
+     key: to-specify
+     url: https://api.openai.com/v1

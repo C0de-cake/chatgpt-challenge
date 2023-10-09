@@ -1,19 +1,17 @@
 package fr.codecake.chatgptchallenge.flow.message.dto.gpt.query;
 
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.enums.GPTRole;
-
 import java.io.Serializable;
 
 
-public class GPTMessageDTO implements Serializable {
-    private GPTRole role;
+public class GPTMessageQueryDTO implements Serializable {
+    private String role;
     private String content;
 
-    public GPTRole getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(GPTRole role) {
+    public void setRole(String role) {
         this.role = role;
     }
 

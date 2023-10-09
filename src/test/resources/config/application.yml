@@ -82,7 +82,11 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  openai:
+    key: to-specify
+    url: https://api.openai.com/v1
+
 management:
   health:
     mail:

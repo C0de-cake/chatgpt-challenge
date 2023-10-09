@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
-public class GPTChoice implements Serializable {
+public class GPTChoiceResponseDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private Integer index;
-    private GPTMessage message;
+    private GPTMessageResponseDTO message;
     private String finishReason;
 
     public Integer getIndex() {
@@ -20,11 +20,11 @@ public class GPTChoice implements Serializable {
         this.index = index;
     }
 
-    public GPTMessage getMessage() {
+    public GPTMessageResponseDTO getMessage() {
         return message;
     }
 
-    public void setMessage(GPTMessage message) {
+    public void setMessage(GPTMessageResponseDTO message) {
         this.message = message;
     }
 

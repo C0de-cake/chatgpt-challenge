@@ -4,18 +4,18 @@ import fr.codecake.chatgptchallenge.flow.message.dto.gpt.enums.GPTRole;
 
 import java.io.Serializable;
 
-public class GPTMessage implements Serializable {
+public class GPTMessageResponseDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private GPTRole role;
+    private String role;
     private String content;
 
-    public GPTRole getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(GPTRole role) {
+    public void setRole(String role) {
         this.role = role;
     }
 

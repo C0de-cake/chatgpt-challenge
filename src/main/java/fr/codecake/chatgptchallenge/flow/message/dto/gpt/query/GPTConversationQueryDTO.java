@@ -1,15 +1,16 @@
 package fr.codecake.chatgptchallenge.flow.message.dto.gpt.query;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.enums.GPTModel;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public class GPTConversationDTO implements Serializable {
-    private GPTModel model;
-    private List<GPTMessageDTO> messages;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class GPTConversationQueryDTO implements Serializable {
+    private String model;
+    private List<GPTMessageQueryDTO> messages;
 
     @JsonProperty("temperature")
     private double temperature;
@@ -39,19 +40,19 @@ public class GPTConversationDTO implements Serializable {
     private String user;
 
     // getters and setters
-    public GPTModel getModel() {
+    public String getModel() {
         return model;
     }
 
-    public void setModel(GPTModel model) {
+    public void setModel(String model) {
         this.model = model;
     }
 
-    public List<GPTMessageDTO> getMessages() {
+    public List<GPTMessageQueryDTO> getMessages() {
         return messages;
     }
 
-    public void setMessages(List<GPTMessageDTO> messages) {
+    public void setMessages(List<GPTMessageQueryDTO> messages) {
         this.messages = messages;
     }
 

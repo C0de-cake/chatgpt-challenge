@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class GPTChatCompletion implements Serializable {
+public class GPTChatCompResponseDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -14,9 +14,9 @@ public class GPTChatCompletion implements Serializable {
     private Long created;
 
     @JsonProperty("choices")
-    private List<GPTChoice> choices;
+    private List<GPTChoiceResponseDTO> choices;
 
-    private GPTUsage usage;
+    private GPTUsageResponseDTO usage;
 
     public String getId() {
         return id;
@@ -42,19 +42,19 @@ public class GPTChatCompletion implements Serializable {
         this.created = created;
     }
 
-    public List<GPTChoice> getChoices() {
+    public List<GPTChoiceResponseDTO> getChoices() {
         return choices;
     }
 
-    public void setChoices(List<GPTChoice> choices) {
+    public void setChoices(List<GPTChoiceResponseDTO> choices) {
         this.choices = choices;
     }
 
-    public GPTUsage getUsage() {
+    public GPTUsageResponseDTO getUsage() {
         return usage;
     }
 
-    public void setUsage(GPTUsage usage) {
+    public void setUsage(GPTUsageResponseDTO usage) {
         this.usage = usage;
     }
 }
