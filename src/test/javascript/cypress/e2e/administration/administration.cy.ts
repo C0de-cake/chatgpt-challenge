@@ -8,8 +8,8 @@ import {
 } from '../../support/commands';
 
 describe('/admin', () => {
-  const username = Cypress.env('E2E_USERNAME') ?? 'admin';
-  const password = Cypress.env('E2E_PASSWORD') ?? 'admin';
+  const username = Cypress.env('E2E_ADMIN_USERNAME') ?? 'admin';
+  const password = Cypress.env('E2E_ADMIN_PASSWORD') ?? 'admin';
 
   beforeEach(() => {
     cy.login(username, password);
