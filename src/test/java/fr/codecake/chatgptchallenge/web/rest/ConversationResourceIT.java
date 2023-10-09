@@ -21,13 +21,12 @@ import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -527,12 +526,7 @@ class ConversationResourceIT {
     @Transactional
     @WithMockUser(authorities = "USER", username = LOGIN_USER)
     void getAllConversationsForAUserSortedByCreatedDate() throws Exception {
-        User user = UserResourceIT.createEntity(em);
-        user.setLogin(LOGIN_USER);
-        Profile profile = ProfileResourceIT.createEntity(em);
-        profileRepository.saveAndFlush(profile);
-        userRepository.saveAndFlush(user);
-        profile.setUser(user);
+        Profile profile = createUserAndProfile(LOGIN_USER);
 
         conversation.setProfile(profile);
 
@@ -568,6 +562,17 @@ class ConversationResourceIT {
             .andExpect(jsonPath("$.[*].publicId").value(hasItem(DEFAULT_PUBLIC_ID.toString())));
     }
 
+    @NotNull
+    private Profile createUserAndProfile(String loginUser) {
+        User user = UserResourceIT.createEntity(em);
+        user.setLogin(loginUser);
+        Profile profile = ProfileResourceIT.createEntity(em);
+        profileRepository.saveAndFlush(profile);
+        userRepository.saveAndFlush(user);
+        profile.setUser(user);
+        return profile;
+    }
+
     @Test
     @Transactional
     @WithMockUser(authorities = "USER", username = "faulty-user")
@@ -579,5 +584,46 @@ class ConversationResourceIT {
         restConversationMockMvc
             .perform(get(ENTITY_API_URL + "/for-connected-user?sort=createdDate,desc"))
             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(authorities = "USER", username = LOGIN_USER)
+    void partialUpdateConversationWithPatchByPublicIdAndUser() throws Exception {
+        // Initialize the database
+        Profile newProfile = createUserAndProfile(LOGIN_USER);
+        newProfile = profileRepository.saveAndFlush(newProfile);
+
+        conversation.setProfile(newProfile);
+        conversationRepository.saveAndFlush(conversation);
+
+        int databaseSizeBeforeUpdate = conversationRepository.findAll().size();
+
+        // Update the conversation using partial update
+        String updateConversationName = "updated-conversation-name";
+        Conversation partialUpdatedConversation = new Conversation();
+        partialUpdatedConversation.setPublicId(conversation.getPublicId());
+
+        partialUpdatedConversation.setName(updateConversationName);
+
+        restConversationMockMvc
+            .perform(
+                patch(ENTITY_API_URL + "/for-connected-user/{public-id}", partialUpdatedConversation.getPublicId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedConversation))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the Conversation in the database
+        List<Conversation> conversationList = conversationRepository.findAll();
+        assertThat(conversationList).hasSize(databaseSizeBeforeUpdate);
+        Conversation testConversation = conversationList.get(conversationList.size() - 1);
+        assertThat(testConversation.getName()).isEqualTo(updateConversationName);
+        assertThat(testConversation.getPublicId()).isEqualTo(DEFAULT_PUBLIC_ID);
+        assertThat(testConversation.getCreatedBy()).isEqualTo(LOGIN_USER);
+        assertThat(testConversation.getCreatedDate()).isNotNull();
+        assertThat(testConversation.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY_SYSTEM);
+        assertThat(testConversation.getLastModifiedDate()).isNotNull();
     }
 }

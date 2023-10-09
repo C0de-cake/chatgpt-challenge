@@ -2,11 +2,13 @@ package fr.codecake.chatgptchallenge.web.rest;
 
 import fr.codecake.chatgptchallenge.repository.ConversationRepository;
 import fr.codecake.chatgptchallenge.security.AuthoritiesConstants;
+import fr.codecake.chatgptchallenge.security.SecurityUtils;
 import fr.codecake.chatgptchallenge.service.ConversationService;
 import fr.codecake.chatgptchallenge.service.dto.ConversationDTO;
 import fr.codecake.chatgptchallenge.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Principal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -204,5 +206,44 @@ public class ConversationResource {
         } catch (UsernameNotFoundException unfe) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    /**
+     * {@code PATCH  /conversations/for-connected-user/:id : Partial updates given fields of an existing conversation, field will ignore if it is null
+     *
+     * @param publicId the publicId of the conversationDTO to save.
+     * @param conversationDTO the conversationDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated conversationDTO,
+     * or with status {@code 400 (Bad Request)} if the conversationDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the conversationDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the conversationDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping(value = "/conversations/for-connected-user/{public-id}", consumes = { "application/json", "application/merge-patch+json" })
+    public ResponseEntity<ConversationDTO> partialUpdateConversationByPublicIdAndUserLogin(
+        @PathVariable(value = "public-id", required = false) final String publicId,
+        @RequestBody ConversationDTO conversationDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to partial update Conversation partially : {}, {}", publicId, conversationDTO);
+        if (conversationDTO.getPublicId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(publicId, conversationDTO.getPublicId().toString())) {
+            throw new BadRequestAlertException("Invalid public ID", ENTITY_NAME, "idinvalid");
+        }
+
+        String currentLogin = SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        if (!conversationRepository
+            .existsConversationByPublicIdAndProfileUserLogin(conversationDTO.getPublicId(), currentLogin)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Optional<ConversationDTO> result = conversationService.partialUpdateByPublicId(conversationDTO);
+
+        return ResponseUtil.wrapOrNotFound(
+            result,
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, conversationDTO.getPublicId().toString())
+        );
     }
 }

@@ -94,6 +94,27 @@ public class ConversationService {
             .map(conversationMapper::toDto);
     }
 
+
+    /**
+     * Partially update a conversation by public id.
+     *
+     * @param conversationDTO the entity to update partially.
+     * @return the persisted entity.
+     */
+    public Optional<ConversationDTO> partialUpdateByPublicId(ConversationDTO conversationDTO) {
+        log.debug("Request to partially update Conversation : {}", conversationDTO);
+
+        return conversationRepository
+            .findOneByPublicId(conversationDTO.getPublicId())
+            .map(existingConversation -> {
+                conversationMapper.partialUpdate(existingConversation, conversationDTO);
+
+                return existingConversation;
+            })
+            .map(conversationRepository::save)
+            .map(conversationMapper::toDto);
+    }
+
     /**
      * Get all the conversations.
      *
