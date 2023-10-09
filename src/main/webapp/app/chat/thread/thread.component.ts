@@ -6,7 +6,7 @@ import {IConversationWithMessages} from "../../entities/conversation/conversatio
   templateUrl: './thread.component.html',
   styleUrls: ['./thread.component.scss']
 })
-export class ThreadComponent implements OnInit {
+export class ThreadComponent {
 
   @Input()
   public conversation: IConversationWithMessages | null | undefined;
@@ -18,13 +18,6 @@ export class ThreadComponent implements OnInit {
   public sendMessage = new EventEmitter<string>();
 
   public message = '';
-
-  constructor() {
-    // TODO : Charger la conversation via l'URL2
-  }
-
-  ngOnInit(): void {
-  }
 
   onSendMessage(): void {
     if(!this.loading) {
