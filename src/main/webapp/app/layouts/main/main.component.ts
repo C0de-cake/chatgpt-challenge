@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
   selector: 'jhi-main',
   templateUrl: './main.component.html',
   providers: [AppPageTitleStrategy],
+  styleUrls: ['./main.component.scss']
 })
 export default class MainComponent implements OnInit {
   private renderer: Renderer2;
