@@ -1,0 +1,29 @@
+{
+  "applications": "*",
+  "changelogDate": "20230717013744",
+  "dto": "mapstruct",
+  "entityTableName": "message",
+  "fields": [
+    {
+      "fieldName": "content",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "owner",
+      "fieldType": "Owner",
+      "fieldValues": "USER,GPT"
+    }
+  ],
+  "name": "Message",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "conversation",
+      "relationshipName": "conversation",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

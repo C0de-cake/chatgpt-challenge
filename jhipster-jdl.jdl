@@ -1,0 +1,21 @@
+
+entity Conversation {
+	name String
+}
+
+entity Message {
+	content String,
+    owner Owner
+}
+
+enum Owner {
+    USER, GPT
+}
+
+relationship OneToMany {
+	Conversation to Message{conversation},
+}
+
+paginate * with pagination
+dto * with mapstruct
+service * with serviceClass

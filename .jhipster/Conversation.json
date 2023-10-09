@@ -1,0 +1,25 @@
+{
+  "applications": "*",
+  "changelogDate": "20230717013743",
+  "dto": "mapstruct",
+  "entityTableName": "conversation",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Conversation",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "message",
+      "otherEntityRelationshipName": "conversation",
+      "relationshipName": "message",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}
