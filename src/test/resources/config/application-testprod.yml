@@ -14,7 +14,7 @@ spring:
     hikari:
       poolName: Hikari
       auto-commit: false
-      maximum-pool-size: 1
+      maximum-pool-size: 5
   jpa:
     open-in-view: false
     hibernate:
