@@ -1,14 +1,13 @@
 package fr.codecake.chatgptchallenge.flow.message.service;
 
 import fr.codecake.chatgptchallenge.domain.enumeration.Owner;
-import fr.codecake.chatgptchallenge.flow.message.dto.FlowMessageQueryDTO;
-import fr.codecake.chatgptchallenge.flow.message.dto.FlowMessageResponseDTO;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.enums.GPTRole;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTChatCompResponseDTO;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTChoiceResponseDTO;
-import fr.codecake.chatgptchallenge.flow.message.exception.OpenAIException;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.FlowMessageQueryDTO;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.FlowMessageResponseDTO;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.enums.GPTRole;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTChatCompResponseDTO;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTChoiceResponseDTO;
+import fr.codecake.chatgptchallenge.flow.message.service.exception.OpenAIException;
 import fr.codecake.chatgptchallenge.service.ConversationService;
-import fr.codecake.chatgptchallenge.service.MessageService;
 import fr.codecake.chatgptchallenge.service.dto.ConversationDTO;
 import fr.codecake.chatgptchallenge.service.dto.MessageDTO;
 import org.springframework.stereotype.Service;
@@ -84,10 +83,10 @@ public class FlowMessageService {
     }
 
     private Owner mapGPTRoleToOwner(String role) {
-        if (role.equals(GPTRole.USER.name())) {
+        if (role.equals(GPTRole.USER.getValue())) {
             return Owner.USER;
-        } else if (role.equals(GPTRole.SYSTEM.name()) ||
-            role.equals(GPTRole.ASSISTANT.name())) {
+        } else if (role.equals(GPTRole.SYSTEM.getValue()) ||
+            role.equals(GPTRole.ASSISTANT.getValue())) {
             return Owner.GPT;
         } else {
             return null;

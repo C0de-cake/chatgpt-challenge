@@ -1,8 +1,8 @@
-package fr.codecake.chatgptchallenge.flow.message.rest;
+package fr.codecake.chatgptchallenge.flow.message.web.rest;
 
-import fr.codecake.chatgptchallenge.flow.message.dto.FlowMessageQueryDTO;
-import fr.codecake.chatgptchallenge.flow.message.dto.FlowMessageResponseDTO;
-import fr.codecake.chatgptchallenge.flow.message.exception.OpenAIException;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.FlowMessageQueryDTO;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.FlowMessageResponseDTO;
+import fr.codecake.chatgptchallenge.flow.message.service.exception.OpenAIException;
 import fr.codecake.chatgptchallenge.flow.message.service.FlowMessageService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;

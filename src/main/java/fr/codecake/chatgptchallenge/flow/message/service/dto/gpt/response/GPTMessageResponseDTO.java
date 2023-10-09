@@ -1,6 +1,4 @@
-package fr.codecake.chatgptchallenge.flow.message.dto.gpt.response;
-
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.enums.GPTRole;
+package fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response;
 
 import java.io.Serializable;
 

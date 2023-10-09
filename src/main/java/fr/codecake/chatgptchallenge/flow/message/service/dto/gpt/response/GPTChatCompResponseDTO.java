@@ -1,4 +1,4 @@
-package fr.codecake.chatgptchallenge.flow.message.dto.gpt.response;
+package fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response;
 
 import java.io.Serializable;
 import java.util.List;
@@ -12,6 +12,7 @@ public class GPTChatCompResponseDTO implements Serializable {
     private String id;
     private String object;
     private Long created;
+    private String model;
 
     @JsonProperty("choices")
     private List<GPTChoiceResponseDTO> choices;
@@ -56,6 +57,14 @@ public class GPTChatCompResponseDTO implements Serializable {
 
     public void setUsage(GPTUsageResponseDTO usage) {
         this.usage = usage;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
     }
 }
 

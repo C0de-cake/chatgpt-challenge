@@ -1,17 +1,11 @@
 package fr.codecake.chatgptchallenge.flow.message.service;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.enums.GPTModel;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.enums.GPTRole;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.query.GPTConversationQueryDTO;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.query.GPTMessageQueryDTO;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTChatCompResponseDTO;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTChoiceResponseDTO;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTMessageResponseDTO;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTUsageResponseDTO;
-import fr.codecake.chatgptchallenge.flow.message.rest.FlowMessageResource;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.enums.GPTModel;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.enums.GPTRole;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.query.GPTConversationQueryDTO;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.query.GPTMessageQueryDTO;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTChatCompResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

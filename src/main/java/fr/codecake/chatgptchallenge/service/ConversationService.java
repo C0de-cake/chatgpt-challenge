@@ -4,7 +4,10 @@ import fr.codecake.chatgptchallenge.domain.Conversation;
 import fr.codecake.chatgptchallenge.repository.ConversationRepository;
 import fr.codecake.chatgptchallenge.service.dto.ConversationDTO;
 import fr.codecake.chatgptchallenge.service.mapper.ConversationMapper;
+
 import java.util.Optional;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -42,6 +45,9 @@ public class ConversationService {
      */
     public ConversationDTO save(ConversationDTO conversationDTO) {
         log.debug("Request to save Conversation : {}", conversationDTO);
+        if (conversationDTO.getPublicId() == null) {
+            conversationDTO.setPublicId(UUID.randomUUID());
+        }
         Conversation conversation = conversationMapper.toEntity(conversationDTO);
         conversation = conversationRepository.save(conversation);
         return conversationMapper.toDto(conversation);

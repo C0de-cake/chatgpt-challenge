@@ -1,4 +1,4 @@
-package fr.codecake.chatgptchallenge.flow.message.dto;
+package fr.codecake.chatgptchallenge.flow.message.service.dto;
 
 import jakarta.validation.constraints.NotNull;
 

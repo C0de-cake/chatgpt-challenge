@@ -1,4 +1,4 @@
-package fr.codecake.chatgptchallenge.flow.message.exception;
+package fr.codecake.chatgptchallenge.flow.message.service.exception;
 
 public class OpenAIException extends RuntimeException {
 

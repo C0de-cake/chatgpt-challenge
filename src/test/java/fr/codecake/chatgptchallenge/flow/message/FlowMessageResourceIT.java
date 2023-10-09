@@ -4,12 +4,13 @@ import fr.codecake.chatgptchallenge.IntegrationTest;
 import fr.codecake.chatgptchallenge.domain.Conversation;
 import fr.codecake.chatgptchallenge.domain.Message;
 import fr.codecake.chatgptchallenge.domain.enumeration.Owner;
-import fr.codecake.chatgptchallenge.flow.message.dto.FlowMessageQueryDTO;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.enums.GPTRole;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTChatCompResponseDTO;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTChoiceResponseDTO;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTMessageResponseDTO;
-import fr.codecake.chatgptchallenge.flow.message.dto.gpt.response.GPTUsageResponseDTO;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.FlowMessageQueryDTO;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.enums.GPTModel;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.enums.GPTRole;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTChatCompResponseDTO;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTChoiceResponseDTO;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTMessageResponseDTO;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTUsageResponseDTO;
 import fr.codecake.chatgptchallenge.repository.ConversationRepository;
 import fr.codecake.chatgptchallenge.repository.MessageRepository;
 import fr.codecake.chatgptchallenge.web.rest.TestUtil;
@@ -17,8 +18,8 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -59,7 +60,20 @@ class FlowMessageResourceIT {
 
     private static final String DEFAULT_CONTENT_FROM_USER = "Hello, I want to know what's JHipster?";
 
-    private static final String DEFAULT_CONTENT_FROM_GPT = "Hello there, how may I assist you today?";
+    private static final String DEFAULT_CONTENT_FROM_GPT = "JHipster is an open-source development platform that allows " +
+        "developers to quickly generate, develop, and deploy modern web applications and microservices. " +
+        "It combines popular frameworks and tools such as Spring Boot, Angular, React, and Vue.js to provide" +
+        " a full-stack development experience.\\n\\nJHipster provides a command-line interface (CLI) " +
+        "that generates a project structure, including the backend and frontend components, database " +
+        "configuration, security setup, and more. It follows best practices and conventions to ensure " +
+        "a scalable and maintainable application architecture.\\n\\nWith JHipster, developers can " +
+        "easily create CRUD (Create, Read, Update, Delete) operations, handle authentication and " +
+        "authorization, manage database migrations, and integrate with various technologies like " +
+        "caching, messaging, and search engines. It also supports the creation of microservices " +
+        "and provides tools for deployment and continuous integration.\\n\\nOverall, JHipster " +
+        "aims to simplify and accelerate the development process by providing a pre-configured, " +
+        "opinionated setup that allows developers to focus on building business logic rather " +
+        "than spending time on repetitive tasks.";
 
     @Autowired
     private EntityManager em;
@@ -82,9 +96,15 @@ class FlowMessageResourceIT {
 
     private ObjectMapper mapper = new ObjectMapper();
 
+    private final String baseUrl;
+
+    FlowMessageResourceIT(@Value("${application.openai.url}") String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
     @BeforeEach
     public void setup() {
-//        mockServer = MockRestServiceServer.createServer(restTemplate);
+        mockServer = MockRestServiceServer.createServer(restTemplate);
         messageRepository.deleteAll();
         conversationRepository.deleteAll();
     }
@@ -114,11 +134,11 @@ class FlowMessageResourceIT {
         flowMessageQueryDTO.setConversationPublicId(null);
     }
 
-    private void prepareGPTAPICallMock() throws URISyntaxException, JsonProcessingException {
+    private void fakeGPTAPICall() throws URISyntaxException, JsonProcessingException {
         GPTUsageResponseDTO usage = new GPTUsageResponseDTO();
-        usage.setPromptTokens(9);
-        usage.setCompletionTokens(12);
-        usage.setTotalTokens(21);
+        usage.setPromptTokens(19);
+        usage.setCompletionTokens(203);
+        usage.setTotalTokens(222);
 
         GPTMessageResponseDTO gptMessage = new GPTMessageResponseDTO();
         gptMessage.setRole(GPTRole.ASSISTANT.name().toLowerCase());
@@ -137,9 +157,10 @@ class FlowMessageResourceIT {
         chatCompletion.setCreated(1677652288L);
         chatCompletion.setChoices(choices);
         chatCompletion.setUsage(usage);
+        chatCompletion.setModel(GPTModel.GPT_3_5_TURBO_0613.getName());
 
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI("http://localhost:8080/employee/E001")))
+                requestTo(new URI(this.baseUrl + "/chat/completions")))
             .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
             .andRespond(withStatus(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -150,7 +171,7 @@ class FlowMessageResourceIT {
     @Test
     @Transactional
     public void shouldHandleMessageForANewConversation() throws Exception {
-//        prepareGPTAPICallMock();
+        fakeGPTAPICall();
 
         List<Conversation> noConversationsPresent = conversationRepository.findAll();
         assertThat(noConversationsPresent).isEmpty();
@@ -166,7 +187,7 @@ class FlowMessageResourceIT {
             .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT_FROM_GPT))
             .andExpect(jsonPath("$.conversationPublicId").exists());
 
-//        mockServer.verify();
+        mockServer.verify();
 
         List<Conversation> allConversations = conversationRepository.findAll();
         assertThat(allConversations.size()).isEqualTo(1);
@@ -175,6 +196,8 @@ class FlowMessageResourceIT {
         assertThat(conversationCreated).isPresent();
 
         Conversation conversation = conversationCreated.get();
+        assertThat(conversation.getPublicId()).isNotNull();
+        assertThat(conversation.getName()).isNotNull();
         assertThat(conversation.getMessages().size()).isEqualTo(2);
 
         Optional<Message> messageFromUser = conversation.getMessages()
@@ -194,7 +217,7 @@ class FlowMessageResourceIT {
     @Test
     @Transactional
     public void shouldHandleMessageForAnExistingConversation() throws Exception {
-        prepareGPTAPICallMock();
+        fakeGPTAPICall();
 
         String newMessageContent = "Can you explain what's spring boot?";
         String reponseGPTContent = "reponse GPT";

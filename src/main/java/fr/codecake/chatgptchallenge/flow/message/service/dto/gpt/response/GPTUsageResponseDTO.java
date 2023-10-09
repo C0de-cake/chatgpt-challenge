@@ -1,4 +1,4 @@
-package fr.codecake.chatgptchallenge.flow.message.dto.gpt.response;
+package fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

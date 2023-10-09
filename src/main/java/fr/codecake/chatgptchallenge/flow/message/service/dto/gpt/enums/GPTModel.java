@@ -1,4 +1,4 @@
-package fr.codecake.chatgptchallenge.flow.message.dto.gpt.enums;
+package fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.enums;
 
 public enum GPTModel {
     GPT_4("gpt-4"),

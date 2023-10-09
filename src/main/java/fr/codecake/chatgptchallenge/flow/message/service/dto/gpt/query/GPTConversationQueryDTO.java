@@ -1,4 +1,4 @@
-package fr.codecake.chatgptchallenge.flow.message.dto.gpt.query;
+package fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
