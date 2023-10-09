@@ -2,6 +2,8 @@
   "chatgptChallengeApp": {
     "chat": {
       "title": "ChatGPT - Challenge",
+      "newconversation": "New conversation",
+      "sendmessage": "Send a message",
       "alert": {
         "rename": {
           "success": "Conversation renamed successfuly",

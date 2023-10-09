@@ -7,6 +7,7 @@ import { ThreadComponent } from './thread/thread.component';
 import {InteractionComponent} from "./thread/interaction/interaction.component";
 import {MarkdownModule} from "ngx-markdown";
 import {NgPipesModule} from "ngx-pipes";
+import {TranslateModule} from "@ngx-translate/core";
 
 
 
@@ -17,7 +18,8 @@ import {NgPipesModule} from "ngx-pipes";
     SharedModule,
     FormsModule,
     MarkdownModule,
-    NgPipesModule
+    NgPipesModule,
+    TranslateModule
   ]
 })
 export class ChatModule { }

@@ -28,17 +28,10 @@ import {ChatComponent} from "./chat/chat.component";
         {
           path: 'chat',
           component: ChatComponent,
-          title: 'chat.title',
+          title: 'chatgptChallengeApp.chat.title',
           canActivate: [UserRouteAccessService],
           loadChildren: () => import('./chat/chat.module').then(module => module.ChatModule),
         },
-        // {
-        //   path: 'chat/:id',
-        //   component: ChatComponent,
-        //   title: 'chat.title',
-        //   canActivate: [UserRouteAccessService],
-        //   loadChildren: () => import('./chat/chat.module').then(module => module.ChatModule),
-        // },
         {
           path: 'admin',
           data: {
