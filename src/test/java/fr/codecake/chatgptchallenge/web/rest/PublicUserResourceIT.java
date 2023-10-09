@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import fr.codecake.chatgptchallenge.IntegrationTest;
-import fr.codecake.chatgptchallenge.config.TestSecurityConfiguration;
 import fr.codecake.chatgptchallenge.domain.User;
 import fr.codecake.chatgptchallenge.repository.UserRepository;
 import fr.codecake.chatgptchallenge.security.AuthoritiesConstants;

@@ -1,6 +1,5 @@
 package fr.codecake.chatgptchallenge;
 
-import fr.codecake.chatgptchallenge.ChatgptChallengeApp;
 import fr.codecake.chatgptchallenge.config.AsyncSyncConfiguration;
 import fr.codecake.chatgptchallenge.config.EmbeddedSQL;
 import fr.codecake.chatgptchallenge.config.TestSecurityConfiguration;
