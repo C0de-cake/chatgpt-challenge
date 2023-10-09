@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {IMessage} from "../../../entities/message/message.model";
 import {AccountService} from "../../../core/auth/account.service";
 import {Account} from "../../../core/auth/account.model";
+import {MarkdownService} from "ngx-markdown";
 
 @Component({
   selector: 'jhi-interaction',
@@ -18,7 +19,7 @@ export class InteractionComponent implements OnInit {
 
   account: Account | null = null;
 
-  constructor(private accountService: AccountService) {
+  constructor(private accountService: AccountService, private markdownService: MarkdownService) {
 
   }
 

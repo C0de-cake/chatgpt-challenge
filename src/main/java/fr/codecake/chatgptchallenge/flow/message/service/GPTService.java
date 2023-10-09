@@ -43,8 +43,12 @@ public class GPTService {
         message.setContent(content);
         message.setRole(GPTRole.USER.name().toLowerCase());
 
+        GPTMessageQueryDTO messageFromSystem = new GPTMessageQueryDTO();
+        messageFromSystem.setContent("you are a helpful assistant, you should answer with Markdown format");
+        messageFromSystem.setRole(GPTRole.SYSTEM.name().toLowerCase());
+
         GPTConversationQueryDTO gptConversationDTO = new GPTConversationQueryDTO();
-        gptConversationDTO.setMessages(List.of(message));
+        gptConversationDTO.setMessages(List.of(messageFromSystem, message));
         gptConversationDTO.setModel(GPTModel.GPT_3_5_TURBO.getName());
         gptConversationDTO.setN(1);
         gptConversationDTO.setMaxTokens(1000);
@@ -53,6 +57,7 @@ public class GPTService {
         try {
             return callAPI(gptConversationDTO);
         } catch (Exception e) {
+            log.error("Error when calling the API", e);
             return Optional.empty();
         }
     }

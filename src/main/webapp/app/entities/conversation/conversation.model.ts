@@ -19,5 +19,6 @@ export interface IConversationWithMessages {
   id: number;
   name?: string | null;
   publicId?: string | null;
+  createdDate?: dayjs.Dayjs | null;
   messages?: Array<IMessage>;
 }

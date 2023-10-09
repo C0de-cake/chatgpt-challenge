@@ -15,7 +15,11 @@
     <div *ngIf="message.owner == 'GPT'" class="px-1 py-1 container-gpt-avatar">
       <img [ngSrc]="'./content/images/gpt-avatar.svg'" width="40" height="40" priority class="gpt-avatar" alt="gpt-avatar">
     </div>
-    <div class="ms-4" style="padding-top: 11px">{{message.content}}</div>
+    <div class="ms-4" style="padding-top: 11px" *ngIf="message.content">
+      <markdown
+        [data]="message.content">
+      </markdown>
+    </div>
   </div>
   <div class="col-3"></div>
 </div>

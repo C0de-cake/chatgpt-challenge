@@ -7,7 +7,7 @@ import {HttpErrorResponse, HttpResponse} from "@angular/common/http";
 import {Router} from "@angular/router";
 import {ChatService, EntityResponseType} from "./chat.service";
 import {FlowMessageQueryDTO, FlowMessageResponseDTO} from "./flow-message.model";
-import {IMessage, NewMessage} from "../entities/message/message.model";
+import {IMessage} from "../entities/message/message.model";
 import dayjs from "dayjs/esm";
 import { cloneDeep } from 'lodash-es';
 
@@ -160,7 +160,7 @@ export class ChatComponent implements OnInit {
       });
   }
 
-  private handleFetchConversationSuccess(conversations: IConversation[] | null): void {
+  private handleFetchConversationSuccess(conversations: IConversationWithMessages[] | null): void {
     if (conversations !== null) {
       this.conversationsByMonths.clear();
       for (const conversation of conversations) {
