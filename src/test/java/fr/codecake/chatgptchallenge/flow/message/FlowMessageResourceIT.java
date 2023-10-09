@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
 
 import static fr.codecake.chatgptchallenge.test.util.OAuth2TestUtil.TEST_USER_LOGIN;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -198,7 +197,7 @@ class FlowMessageResourceIT {
         Optional<Conversation> conversationCreated = allConversations.stream().findFirst();
         assertThat(conversationCreated).isPresent();
 
-        Conversation conversation = conversationCreated.get();
+        Conversation conversation = conversationCreated.orElseThrow();
         assertThat(conversation.getPublicId()).isNotNull();
         assertThat(conversation.getName()).isNotNull();
         assertThat(conversation.getMessages().size()).isEqualTo(2);
@@ -209,12 +208,12 @@ class FlowMessageResourceIT {
             .stream().filter(message -> message.getOwner().equals(Owner.GPT)).findFirst();
 
         assertThat(messageFromUser).isPresent();
-        assertThat(messageFromUser.get().getContent()).isEqualTo(DEFAULT_CONTENT_FROM_USER);
-        assertThat(messageFromUser.get().getId()).isNotNull();
+        assertThat(messageFromUser.orElseThrow().getContent()).isEqualTo(DEFAULT_CONTENT_FROM_USER);
+        assertThat(messageFromUser.orElseThrow().getId()).isNotNull();
 
         assertThat(messageFromGPT).isPresent();
-        assertThat(messageFromGPT.get().getContent()).isEqualTo(DEFAULT_CONTENT_FROM_GPT);
-        assertThat(messageFromGPT.get().getId()).isNotNull();
+        assertThat(messageFromGPT.orElseThrow().getContent()).isEqualTo(DEFAULT_CONTENT_FROM_GPT);
+        assertThat(messageFromGPT.orElseThrow().getId()).isNotNull();
     }
 
     @Test
@@ -251,7 +250,7 @@ class FlowMessageResourceIT {
         Optional<Conversation> conversationAlreadyPresent = conversationsPresent.stream().findFirst();
         assertThat(conversationAlreadyPresent).isPresent();
 
-        assertThat(conversationAlreadyPresent.get().getMessages().size()).isEqualTo(2);
+        assertThat(conversationAlreadyPresent.orElseThrow().getMessages().size()).isEqualTo(2);
 
         flowMessageQueryDTO.setNewConversation(false);
         flowMessageQueryDTO.setConversationPublicId(conversation.getPublicId());
@@ -276,7 +275,7 @@ class FlowMessageResourceIT {
         Optional<Conversation> conversationCreated = onlyOneConversationStillPresent.stream().findFirst();
         assertThat(conversationCreated).isPresent();
 
-        Conversation conversationToVerify = conversationCreated.get();
+        Conversation conversationToVerify = conversationCreated.orElseThrow();
 
         Set<Message> messagesFromUser = conversationToVerify.getMessages()
             .stream()
