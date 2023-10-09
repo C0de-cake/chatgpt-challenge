@@ -58,6 +58,7 @@ public class Conversation implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "conversation")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "conversation" }, allowSetters = true)
+    @OrderBy(value = "createdDate asc")
     private Set<Message> messages = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

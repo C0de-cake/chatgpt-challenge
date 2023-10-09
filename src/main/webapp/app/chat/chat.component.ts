@@ -1,10 +1,15 @@
 import {Component, OnInit} from '@angular/core';
 import {ConversationService} from "../entities/conversation/service/conversation.service";
-import {IConversation} from "../entities/conversation/conversation.model";
+import {IConversation, IConversationWithMessages} from "../entities/conversation/conversation.model";
 import {map} from "rxjs/operators";
 import {Alert, AlertService} from "../core/util/alert.service";
 import {HttpErrorResponse, HttpResponse} from "@angular/common/http";
 import {Router} from "@angular/router";
+import {ChatService, EntityResponseType} from "./chat.service";
+import {FlowMessageQueryDTO, FlowMessageResponseDTO} from "./flow-message.model";
+import {IMessage, NewMessage} from "../entities/message/message.model";
+import dayjs from "dayjs/esm";
+import { cloneDeep } from 'lodash-es';
 
 @Component({
   selector: 'jhi-chat',
@@ -15,14 +20,17 @@ export class ChatComponent implements OnInit {
 
   conversationsByMonths = new Map<string, IConversation[]>();
 
-  conversationSelected: IConversation = {id: 0};
+  conversationSelected: IConversationWithMessages = {id: 0};
 
   isEditMode = false;
   private clonedName: string | null | undefined = '';
 
+  public loadingMessage = false;
+
   constructor(private conversationService: ConversationService,
               private alertService: AlertService,
-              private router: Router) {
+              private router: Router,
+              private charService: ChatService) {
   }
 
   ngOnInit(): void {
@@ -78,6 +86,22 @@ export class ChatComponent implements OnInit {
   }
 
   trackId = (publicId: number, item: IConversation): string => this.conversationService.getConversationPublicIdentifier(item);
+
+
+  onSendMessage(newMessage: string): void {
+    this.loadingMessage = true;
+    const newMessageQuery: FlowMessageQueryDTO = {
+      content: newMessage,
+      newConversation: this.conversationSelected.id === 0,
+      conversationPublicId: this.conversationSelected.id !== 0 ? this.conversationSelected.publicId : null
+    }
+    this.charService.sendMessage(newMessageQuery)
+      .subscribe({
+          next: (res) => this.onMessageSuccess(res, newMessage),
+          error: (err: HttpErrorResponse) => this.onErrorSendMessage(err)
+        }
+      )
+  }
 
   private handleDeleteError(err: HttpErrorResponse): void {
     const alert: Alert = {
@@ -152,5 +176,63 @@ export class ChatComponent implements OnInit {
         }
       }
     }
+  }
+
+  private onErrorSendMessage(err: HttpErrorResponse): void {
+    this.loadingMessage = false;
+    const alert: Alert = {
+      translationKey: 'chatgptChallengeApp.chat.alert.send.error',
+      translationParams: {error: err.message},
+      type: 'danger', toast: true
+    };
+    this.alertService.addAlert(alert);
+  }
+
+  private onMessageSuccess(res: EntityResponseType, messageContentFromUser: string): void {
+    this.loadingMessage = false;
+    const flowMessageResponse = res.body;
+
+    if (flowMessageResponse?.conversation) {
+      this.mapNewConversationAndMessagesFromAPI(flowMessageResponse, messageContentFromUser);
+      this.putNewConversationInCurrentMonth();
+    } else {
+      this.putMessageInExistingConversation(flowMessageResponse, messageContentFromUser);
+    }
+  }
+
+  private putMessageInExistingConversation(flowMessageResponse: FlowMessageResponseDTO | null, messageContentFromUser: string): void {
+    for (const conversationsEntry of this.conversationsByMonths.entries()) {
+      for (const conversation of conversationsEntry[1]) {
+        if (conversation.publicId === flowMessageResponse?.conversationPublicId) {
+          if (flowMessageResponse && this.conversationSelected.messages) {
+            const messageGPT: IMessage = {id: 1, content: flowMessageResponse.content, owner: "GPT"};
+            const messageUser: IMessage = {id: 0, content: messageContentFromUser, owner: "USER"}
+            this.conversationSelected.messages.push(messageUser);
+            this.conversationSelected.messages.push(messageGPT);
+          }
+        }
+      }
+    }
+  }
+
+  private putNewConversationInCurrentMonth(): void {
+    const currentMonth = dayjs().format('MMMM');
+    if (this.conversationsByMonths.has(currentMonth)) {
+      this.conversationsByMonths.get(currentMonth)?.push(cloneDeep(this.conversationSelected));
+    } else {
+      const conversationsSpecificMonth = new Array<IConversation>();
+      conversationsSpecificMonth.push(cloneDeep(this.conversationSelected));
+      this.conversationsByMonths.set(currentMonth, conversationsSpecificMonth);
+    }
+  }
+
+  private mapNewConversationAndMessagesFromAPI(flowMessageResponse: FlowMessageResponseDTO,
+                                            messageContentFromUser: string): void {
+    this.conversationSelected = flowMessageResponse.conversation as IConversationWithMessages;
+    this.conversationSelected.messages = new Array<IMessage>();
+    const messageUser: IMessage = {id: 0, content: messageContentFromUser, owner: "USER"}
+    const messageGPT: IMessage = {id: 1, content: flowMessageResponse.content, owner: "GPT"};
+    this.conversationSelected.messages.push(messageUser);
+    this.conversationSelected.messages.push(messageGPT);
   }
 }

@@ -3,6 +3,8 @@
 #controls {
   width: 250px;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 #conversations {
@@ -14,7 +16,6 @@
 }
 
 #list {
-  height: calc(100% - 50px);
   overflow-y: scroll;
 }
 
@@ -36,10 +37,6 @@
 
 .active-conversation {
   background-color: $btn-active-bg;
-}
-
-#chat {
-  background-color: #343640;
 }
 
 .month {

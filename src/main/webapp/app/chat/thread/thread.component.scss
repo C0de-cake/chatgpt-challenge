@@ -1,0 +1,23 @@
+@import '../../../content/scss/bootstrap-variables';
+
+#send-icon {
+  color: $white;
+}
+
+#main {
+  height: 100%;
+  background-color: #343541;
+}
+
+.form-control {
+  background-color: #40414f;
+  border-color: $gray-700;
+}
+
+.form-control::placeholder {
+  color: #89899b;
+}
+
+.form-control {
+  color: $white;
+}

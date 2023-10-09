@@ -1,6 +1,7 @@
 package fr.codecake.chatgptchallenge.flow.message.service;
 
 import fr.codecake.chatgptchallenge.domain.enumeration.Owner;
+import fr.codecake.chatgptchallenge.flow.message.service.dto.FlowConversationDTO;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.FlowMessageQueryDTO;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.FlowMessageResponseDTO;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.enums.GPTRole;
@@ -87,7 +88,14 @@ public class FlowMessageService {
         conversationDTO = conversationService.saveWithMessages(conversationDTO);
 
         flowMessageResponseDTO.setContent(newMessagesFromGPT.getContent());
-        flowMessageResponseDTO.setConversationPublicId(conversationDTO.getPublicId());
+        if(flowMessageQueryDTO.getNewConversation()) {
+            FlowConversationDTO flowConversationDTO = new FlowConversationDTO();
+            flowConversationDTO.setName(conversationDTO.getName());
+            flowConversationDTO.setPublicId(conversationDTO.getPublicId());
+            flowMessageResponseDTO.setConversation(flowConversationDTO);
+        } else {
+            flowMessageResponseDTO.setConversationPublicId(conversationDTO.getPublicId());
+        }
     }
 
     private static MessageDTO createNewMessageForDB(String content,

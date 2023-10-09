@@ -1,8 +1,8 @@
 <jhi-alert-error></jhi-alert-error>
 <jhi-alert></jhi-alert>
-<div class="row" id="conversations">
-  <div class="col-3 px-0" id="controls">
-    <div class="pe-2">
+<div class="d-flex" id="conversations">
+  <div class="px-0" id="controls">
+    <div class="pe-2 pt-3 ps-2">
       <div class="btn btn-primary w-100 text-start">
         <fa-icon icon="plus" class="pe-2"></fa-icon>
         <span>New conversation</span>
@@ -12,7 +12,10 @@
       <div id="intermediate-container-list">
         <div *ngFor="let conversationsByMonth of conversationsByMonths| keyvalue">
           <div class="month">{{conversationsByMonth.key}}</div>
-          <button [attr.data-cy]="'conversation-' + index" *ngFor="let conversation of conversationsByMonth.value; trackBy: trackId; index as index;"
+          <button [class.active-conversation]="conversationSelected.id == conversation.id"
+                  [attr.data-cy]="'conversation-' + index"
+                  *ngFor="let conversation of conversationsByMonth.value;
+                   trackBy: trackId; index as index;"
                   class="btn btn-dark my-1 w-100 text-start d-flex align-items-center">
             <fa-icon icon="message" class="pe-3"></fa-icon>
             <div class="btn-conversation d-flex align-items-center justify-content-between flex-grow-1">
@@ -40,6 +43,10 @@
       </div>
     </div>
   </div>
-  <div class="col-9 ps-0" id="chat">
+  <div class="h-100 w-100" id="chat">
+    <jhi-thread [conversation]="conversationSelected"
+                [loading]="loadingMessage"
+                (sendMessage)="onSendMessage($event)">
+    </jhi-thread>
   </div>
 </div>

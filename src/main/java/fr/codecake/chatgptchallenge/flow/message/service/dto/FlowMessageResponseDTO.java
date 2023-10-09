@@ -12,6 +12,8 @@ public class FlowMessageResponseDTO implements Serializable {
 
     public UUID conversationPublicId;
 
+    public FlowConversationDTO conversation;
+
     public String getContent() {
         return content;
     }
@@ -26,5 +28,13 @@ public class FlowMessageResponseDTO implements Serializable {
 
     public void setConversationPublicId(UUID conversationPublicId) {
         this.conversationPublicId = conversationPublicId;
+    }
+
+    public FlowConversationDTO getConversation() {
+        return conversation;
+    }
+
+    public void setConversation(FlowConversationDTO conversationDTO) {
+        this.conversation = conversationDTO;
     }
 }

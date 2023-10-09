@@ -1,0 +1,21 @@
+<div class="py-4 row m-0"
+     [class.user]="message.owner == 'USER'"
+     [class.gpt]="message.owner == 'GPT'">
+  <div class="col-3"></div>
+  <div class="col-6 d-flex align-items-start">
+    <div *ngIf="message.owner == 'USER'">
+      <div *ngIf="!account?.imageUrl">
+        <fa-icon icon="user"></fa-icon>
+        <span jhiTranslate="global.menu.account.main">Account</span>
+      </div>
+      <div *ngIf="account?.imageUrl" class="px-1 py-1">
+        <img [ngSrc]="account!.imageUrl!" width="40" height="40" priority class="profile-image" alt="Avatar"/>
+      </div>
+    </div>
+    <div *ngIf="message.owner == 'GPT'" class="px-1 py-1 container-gpt-avatar">
+      <img [ngSrc]="'./content/images/gpt-avatar.svg'" width="40" height="40" priority class="gpt-avatar" alt="gpt-avatar">
+    </div>
+    <div class="ms-4" style="padding-top: 11px">{{message.content}}</div>
+  </div>
+  <div class="col-3"></div>
+</div>

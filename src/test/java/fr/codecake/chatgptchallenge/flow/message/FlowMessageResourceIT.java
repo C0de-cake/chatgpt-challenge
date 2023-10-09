@@ -203,7 +203,8 @@ class FlowMessageResourceIT {
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT_FROM_GPT))
-            .andExpect(jsonPath("$.conversationPublicId").exists());
+            .andExpect(jsonPath("$.conversationPublicId").doesNotExist())
+            .andExpect(jsonPath("$.conversation.name").exists());
 
         mockServer.verify();
 
@@ -298,7 +299,8 @@ class FlowMessageResourceIT {
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT_EXISTING_CONVERSATION_FROM_GPT))
-            .andExpect(jsonPath("$.conversationPublicId").value(conversation.getPublicId().toString()));
+            .andExpect(jsonPath("$.conversationPublicId").value(conversation.getPublicId().toString()))
+            .andExpect(jsonPath("$.conversation").doesNotExist());
 
         mockServer.verify();
 

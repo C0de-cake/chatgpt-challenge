@@ -1,3 +1,5 @@
+import {IConversation} from "../../../../../main/webapp/app/entities/conversation/conversation.model";
+
 describe('Flow conversation e2e test', () => {
   const chatPageUrl = '/';
   const username = Cypress.env('E2E_ADMIN_USERNAME') ?? 'user';
@@ -14,7 +16,8 @@ describe('Flow conversation e2e test', () => {
   before(() => {
     cy.login(username, password);
     conversation1 = {
-      name: conversationName1
+      name: conversationName1,
+
     }
     conversation2 = {
       name: conversationName2

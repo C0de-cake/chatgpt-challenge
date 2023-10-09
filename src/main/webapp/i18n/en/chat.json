@@ -10,6 +10,9 @@
         "delete": {
           "success": "Conversation deleted successfuly",
           "error": "Error occurred when deleting your conversation: {{error}}"
+        },
+        "send": {
+          "error": "Something wrong happen when sending a message to GPT {{error}}"
         }
       }
     }
