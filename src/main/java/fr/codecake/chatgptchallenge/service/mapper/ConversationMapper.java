@@ -10,7 +10,11 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {MessageMapper.class})
 public interface ConversationMapper extends EntityMapper<ConversationDTO, Conversation> {
 
+    @Named("without-messages")
+    @Mapping(target = "messages", source = "messages", ignore = true)
+    Conversation toEntityWithoutMessages(ConversationDTO conversationDTO);
+
     @Named("with-messages")
-    @Mapping(target = "messages", source = "messages")
+    @Mapping(target = "messages", source = "messages", qualifiedByName = "without-conversation")
     Conversation toEntityWithMessages(ConversationDTO conversationDTO);
 }

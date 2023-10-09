@@ -1,18 +1,24 @@
 package fr.codecake.chatgptchallenge.service;
 
 import fr.codecake.chatgptchallenge.domain.Conversation;
+import fr.codecake.chatgptchallenge.domain.Message;
 import fr.codecake.chatgptchallenge.repository.ConversationRepository;
+import fr.codecake.chatgptchallenge.repository.MessageRepository;
 import fr.codecake.chatgptchallenge.service.dto.ConversationDTO;
+import fr.codecake.chatgptchallenge.service.dto.MessageDTO;
 import fr.codecake.chatgptchallenge.service.mapper.ConversationMapper;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import fr.codecake.chatgptchallenge.service.mapper.MessageMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -120,11 +126,20 @@ public class ConversationService {
         conversationRepository.deleteById(id);
     }
 
-    @Transactional
     public ConversationDTO saveWithMessages(ConversationDTO conversationDTO) {
-        Conversation conversationToSave = conversationMapper.toEntityWithMessages(conversationDTO);
-        conversationToSave = conversationRepository.save(conversationToSave);
-        messageService.saveAll(conversationDTO.getMessages());
-        return conversationMapper.toDto(conversationToSave);
+        Conversation conversationToSave = conversationMapper.toEntityWithoutMessages(conversationDTO);
+
+        List<MessageDTO> messagesDTO = messageService.saveAll(conversationDTO.getMessages());
+
+        List<Message> messages = messageService.mapListToEntity(messagesDTO);
+        conversationToSave.getMessages().addAll(messages);
+        conversationRepository.save(conversationToSave);
+        return conversationDTO;
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<ConversationDTO> findOneByPublicId(UUID publicId) {
+        log.debug("Request to get Conversation by public id : {}", publicId);
+        return conversationRepository.findOneByPublicId(publicId).map(conversationMapper::toDto);
     }
 }

@@ -6,6 +6,7 @@ import fr.codecake.chatgptchallenge.flow.message.service.dto.FlowMessageResponse
 import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.enums.GPTRole;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTChatCompResponseDTO;
 import fr.codecake.chatgptchallenge.flow.message.service.dto.gpt.response.GPTChoiceResponseDTO;
+import fr.codecake.chatgptchallenge.flow.message.service.exception.ConversationNotExistException;
 import fr.codecake.chatgptchallenge.flow.message.service.exception.OpenAIException;
 import fr.codecake.chatgptchallenge.service.ConversationService;
 import fr.codecake.chatgptchallenge.service.dto.ConversationDTO;
@@ -14,11 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -35,47 +33,59 @@ public class FlowMessageService {
     }
 
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public FlowMessageResponseDTO sendMessage(FlowMessageQueryDTO flowMessageQueryDTO) throws OpenAIException {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public FlowMessageResponseDTO sendMessage(FlowMessageQueryDTO flowMessageQueryDTO) throws OpenAIException, ConversationNotExistException {
         FlowMessageResponseDTO flowMessageResponseDTO = new FlowMessageResponseDTO();
         if (flowMessageQueryDTO.getNewConversation()) {
-            ConversationDTO unsavedConversationDTO = new ConversationDTO();
-            unsavedConversationDTO.setName(UUID.randomUUID().toString().substring(0, 6));
-            final ConversationDTO savedConversationDTO = conversationService.save(unsavedConversationDTO);
-
-            MessageDTO messageFromUserDTO = new MessageDTO();
-            messageFromUserDTO.setOwner(Owner.USER);
-            messageFromUserDTO.setContent(flowMessageQueryDTO.getContent());
-            messageFromUserDTO.setConversation(savedConversationDTO);
-
-            GPTChatCompResponseDTO gptChatCompResponseDTO = gptService.sendMessage(flowMessageQueryDTO.getContent())
-                .orElseThrow(() ->
-                    new OpenAIException(format("Something went wrong when calling the GPT API" +
-                        " for the conversation %s and the message %s", savedConversationDTO.getId(), flowMessageQueryDTO)));
-            List<MessageDTO> newMessagesDTO = gptChatCompResponseDTO.getChoices()
-                .stream()
-                .map(mapChoiceToMessageDTO(savedConversationDTO))
-                .collect(Collectors.toList());
-
-            newMessagesDTO.add(messageFromUserDTO);
-
-            savedConversationDTO.setMessages(newMessagesDTO);
-
-            ConversationDTO saveConversation = conversationService.saveWithMessages(savedConversationDTO);
-
-            MessageDTO messageDTO = newMessagesDTO.stream()
-                .filter(messageDTOToFilter -> messageDTOToFilter.getOwner().equals(Owner.GPT))
-                .findFirst()
-                .orElseThrow(() -> new OpenAIException(format("No message present in the DTO from GPT" +
-                    " for the conversation %s and the message %s", saveConversation.getId(), flowMessageQueryDTO)));
-
-            flowMessageResponseDTO.setContent(messageDTO.getContent());
-            flowMessageResponseDTO.setConversationPublicId(saveConversation.getId());
+            handleNewMessage(flowMessageQueryDTO, flowMessageResponseDTO, new ConversationDTO());
         } else {
-            Optional<ConversationDTO> conversationPresent = conversationService.findOne(flowMessageQueryDTO.getConversationPublicId());
-            // updateConversation()
+            ConversationDTO existingConversation =
+                conversationService.findOneByPublicId(flowMessageQueryDTO.getConversationPublicId())
+                    .orElseThrow(() -> new ConversationNotExistException(format("Conversation with the following public id doesn't exist %s ",
+                        flowMessageQueryDTO.getConversationPublicId())));
+
+            handleNewMessage(flowMessageQueryDTO, flowMessageResponseDTO, existingConversation);
         }
         return flowMessageResponseDTO;
+    }
+
+    private void handleNewMessage(FlowMessageQueryDTO flowMessageQueryDTO, FlowMessageResponseDTO flowMessageResponseDTO, ConversationDTO conversationDTO) {
+        if (conversationDTO.getId() == null) {
+            conversationDTO.setName(UUID.randomUUID().toString().substring(0, 6));
+            conversationDTO = conversationService.save(conversationDTO);
+        }
+
+        MessageDTO messageFromUser = createNewMessageForDB(flowMessageQueryDTO.getContent(),
+            conversationDTO, Owner.USER);
+
+        final Long conversationId = conversationDTO.getId();
+        GPTChatCompResponseDTO gptChatCompResponseDTO = gptService.sendMessage(flowMessageQueryDTO.getContent())
+            .orElseThrow(() ->
+                new OpenAIException(format("Something went wrong when calling the GPT API" +
+                    " for the conversation %s and the message %s", conversationId, flowMessageQueryDTO)));
+
+        MessageDTO newMessagesFromGPT = gptChatCompResponseDTO.getChoices()
+            .stream()
+            .map(mapChoiceToMessageDTO(conversationDTO))
+            .findFirst().orElseThrow(() -> new OpenAIException(format("No message present in the DTO from GPT" +
+                " for the conversation %s and the message %s", conversationId, flowMessageQueryDTO)));
+
+        conversationDTO.getMessages().add(messageFromUser);
+        conversationDTO.getMessages().add(newMessagesFromGPT);
+
+        conversationDTO = conversationService.saveWithMessages(conversationDTO);
+
+        flowMessageResponseDTO.setContent(newMessagesFromGPT.getContent());
+        flowMessageResponseDTO.setConversationPublicId(conversationDTO.getPublicId());
+    }
+
+    private static MessageDTO createNewMessageForDB(String content,
+                                                    ConversationDTO savedConversationDTO, Owner owner) {
+        MessageDTO newMessage = new MessageDTO();
+        newMessage.setOwner(owner);
+        newMessage.setContent(content);
+        newMessage.setConversation(savedConversationDTO);
+        return newMessage;
     }
 
     private Function<GPTChoiceResponseDTO, MessageDTO> mapChoiceToMessageDTO(ConversationDTO conversationDTO) {

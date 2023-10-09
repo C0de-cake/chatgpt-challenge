@@ -36,9 +36,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static fr.codecake.chatgptchallenge.test.util.OAuth2TestUtil.TEST_USER_LOGIN;
@@ -74,6 +72,11 @@ class FlowMessageResourceIT {
         "aims to simplify and accelerate the development process by providing a pre-configured, " +
         "opinionated setup that allows developers to focus on building business logic rather " +
         "than spending time on repetitive tasks.";
+
+    private static final String DEFAULT_CONTENT_EXISTING_CONVERSATION_FROM_GPT = "Spring Boot is a framework that simplifies the" +
+        " development of Java applications by providing" +
+        " a streamlined and opinionated approach to building," +
+        " configuring, and deploying applications.";
 
     @Autowired
     private EntityManager em;
@@ -134,7 +137,7 @@ class FlowMessageResourceIT {
         flowMessageQueryDTO.setConversationPublicId(null);
     }
 
-    private void fakeGPTAPICall() throws URISyntaxException, JsonProcessingException {
+    private void fakeGPTAPICall(String content) throws URISyntaxException, JsonProcessingException {
         GPTUsageResponseDTO usage = new GPTUsageResponseDTO();
         usage.setPromptTokens(19);
         usage.setCompletionTokens(203);
@@ -142,7 +145,7 @@ class FlowMessageResourceIT {
 
         GPTMessageResponseDTO gptMessage = new GPTMessageResponseDTO();
         gptMessage.setRole(GPTRole.ASSISTANT.name().toLowerCase());
-        gptMessage.setContent(DEFAULT_CONTENT_FROM_GPT);
+        gptMessage.setContent(content);
 
         GPTChoiceResponseDTO choice = new GPTChoiceResponseDTO();
         choice.setIndex(0);
@@ -171,7 +174,7 @@ class FlowMessageResourceIT {
     @Test
     @Transactional
     public void shouldHandleMessageForANewConversation() throws Exception {
-        fakeGPTAPICall();
+        fakeGPTAPICall(DEFAULT_CONTENT_FROM_GPT);
 
         List<Conversation> noConversationsPresent = conversationRepository.findAll();
         assertThat(noConversationsPresent).isEmpty();
@@ -217,20 +220,28 @@ class FlowMessageResourceIT {
     @Test
     @Transactional
     public void shouldHandleMessageForAnExistingConversation() throws Exception {
-        fakeGPTAPICall();
+        fakeGPTAPICall(DEFAULT_CONTENT_EXISTING_CONVERSATION_FROM_GPT);
+        String newMessageContent = "Can you explain what's spring boot in one short sentence ?";
 
-        String newMessageContent = "Can you explain what's spring boot?";
-        String reponseGPTContent = "reponse GPT";
+        Message messageFromUser = new Message();
+        messageFromUser.setContent("Hello, I want to know what's JHipster?");
+        messageFromUser.setOwner(Owner.USER);
 
-        Message message = new Message();
-        message.setContent("Hello, I want to know what's JHipster?");
-        message.setOwner(Owner.USER);
-        messageRepository.save(message);
+        Message messageFromGPT = new Message();
+        messageFromGPT.setContent(DEFAULT_CONTENT_FROM_GPT);
+        messageFromGPT.setOwner(Owner.GPT);
+
+        messageRepository.saveAll(List.of(messageFromUser, messageFromGPT));
 
         Conversation conversation = new Conversation();
-        conversation.setName("test conversation");
-        conversation.addMessage(message);
-        message.setConversation(conversation);
+        conversation.setName(UUID.randomUUID().toString().substring(0, 6));
+        conversation.setPublicId(UUID.randomUUID());
+
+        conversation.addMessage(messageFromUser);
+        conversation.addMessage(messageFromGPT);
+
+        messageFromUser.setConversation(conversation);
+        messageFromGPT.setConversation(conversation);
 
         conversationRepository.save(conversation);
 
@@ -240,15 +251,10 @@ class FlowMessageResourceIT {
         Optional<Conversation> conversationAlreadyPresent = conversationsPresent.stream().findFirst();
         assertThat(conversationAlreadyPresent).isPresent();
 
-        int onlyOneMessageShouldBePresent = conversationAlreadyPresent.get().getMessages()
-            .stream()
-            .filter(messageToVerify -> messageToVerify.getOwner().equals(Owner.USER))
-            .collect(Collectors.toSet()).size();
-
-        assertThat(onlyOneMessageShouldBePresent).isEqualTo(1);
+        assertThat(conversationAlreadyPresent.get().getMessages().size()).isEqualTo(2);
 
         flowMessageQueryDTO.setNewConversation(false);
-        flowMessageQueryDTO.setConversationPublicId(1L);
+        flowMessageQueryDTO.setConversationPublicId(conversation.getPublicId());
         flowMessageQueryDTO.setContent(newMessageContent);
 
         restMessageMockMvc
@@ -259,11 +265,10 @@ class FlowMessageResourceIT {
                     .content(TestUtil.convertObjectToJsonBytes(flowMessageQueryDTO))
             )
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.isNewConversation").value(true))
-            .andExpect(jsonPath("$.content").value(reponseGPTContent))
-            .andExpect(jsonPath("$.conversationPublicId").value(1L));
+            .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT_EXISTING_CONVERSATION_FROM_GPT))
+            .andExpect(jsonPath("$.conversationPublicId").value(conversation.getPublicId().toString()));
 
-//        mockServer.verify();
+        mockServer.verify();
 
         List<Conversation> onlyOneConversationStillPresent = conversationRepository.findAll();
         assertThat(onlyOneConversationStillPresent.size()).isEqualTo(1);
@@ -279,15 +284,25 @@ class FlowMessageResourceIT {
             .collect(Collectors.toSet());
 
         assertThat(messagesFromUser)
-            .filteredOn(messageToVerify -> messageToVerify.getId().equals(message.getId())).isNotEmpty();
+            .filteredOn(messageToVerify -> messageToVerify.getId().equals(messageFromUser.getId())).isNotEmpty();
         assertThat(messagesFromUser)
             .filteredOn(messageToVerify -> messageToVerify.getContent().equals(newMessageContent)).isNotEmpty();
+
+        Set<Message> messagesFromGPT = conversationToVerify.getMessages()
+            .stream()
+            .filter(messageToVerify -> messageToVerify.getOwner().equals(Owner.GPT))
+            .collect(Collectors.toSet());
+
+        assertThat(messagesFromGPT)
+            .filteredOn(messageToVerify -> messageToVerify.getId().equals(messageFromGPT.getId())).isNotEmpty();
+        assertThat(messagesFromGPT)
+            .filteredOn(messageToVerify -> messageToVerify.getContent().equals(DEFAULT_CONTENT_FROM_GPT)).isNotEmpty();
     }
 
     @Test
     public void shouldAnswer400WhenRequiredFieldAreNotPresent() throws Exception {
         flowMessageQueryDTO.setNewConversation(false);
-        flowMessageQueryDTO.setConversationPublicId(1L);
+        flowMessageQueryDTO.setConversationPublicId(UUID.randomUUID());
         flowMessageQueryDTO.setContent(null);
 
         restMessageMockMvc
