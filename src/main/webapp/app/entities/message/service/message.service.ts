@@ -110,8 +110,8 @@ export class MessageService {
   protected convertDateFromServer(restMessage: RestMessage): IMessage {
     return {
       ...restMessage,
-      createdDate: restMessage.createdDate ? dayjs(restMessage.createdDate) : undefined,
-      lastModifiedDate: restMessage.lastModifiedDate ? dayjs(restMessage.lastModifiedDate) : undefined,
+      createdDate: restMessage.createdDate ? dayjs.unix(Number(restMessage.createdDate)) : undefined,
+      lastModifiedDate: restMessage.lastModifiedDate ? dayjs.unix(Number(restMessage.lastModifiedDate)) : undefined,
     };
   }
 

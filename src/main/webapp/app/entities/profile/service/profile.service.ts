@@ -110,8 +110,8 @@ export class ProfileService {
   protected convertDateFromServer(restProfile: RestProfile): IProfile {
     return {
       ...restProfile,
-      createdDate: restProfile.createdDate ? dayjs(restProfile.createdDate) : undefined,
-      lastModifiedDate: restProfile.lastModifiedDate ? dayjs(restProfile.lastModifiedDate) : undefined,
+      createdDate: restProfile.createdDate ? dayjs.unix(Number(restProfile.createdDate)) : undefined,
+      lastModifiedDate: restProfile.lastModifiedDate ? dayjs.unix(Number(restProfile.lastModifiedDate)) : undefined,
     };
   }
 
