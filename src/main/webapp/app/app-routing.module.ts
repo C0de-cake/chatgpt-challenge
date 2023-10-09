@@ -9,6 +9,7 @@ import HomeComponent from './home/home.component';
 import NavbarComponent from './layouts/navbar/navbar.component';
 
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
+import {ChatComponent} from "./chat/chat.component";
 
 @NgModule({
   imports: [
@@ -23,6 +24,20 @@ import { UserRouteAccessService } from 'app/core/auth/user-route-access.service'
           path: '',
           component: NavbarComponent,
           outlet: 'navbar',
+        },
+        {
+          path: 'chat',
+          component: ChatComponent,
+          title: 'chat.title',
+          canActivate: [UserRouteAccessService],
+          loadChildren: () => import('./chat/chat.module').then(module => module.ChatModule),
+        },
+        {
+          path: 'chat/:id',
+          component: ChatComponent,
+          title: 'chat.title',
+          canActivate: [UserRouteAccessService],
+          loadChildren: () => import('./chat/chat.module').then(module => module.ChatModule),
         },
         {
           path: 'admin',

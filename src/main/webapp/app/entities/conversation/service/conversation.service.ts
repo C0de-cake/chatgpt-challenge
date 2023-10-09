@@ -75,6 +75,10 @@ export class ConversationService {
     return conversation.id;
   }
 
+  getConversationPublicIdentifier(conversation: Pick<IConversation, 'publicId'>): string {
+    return conversation.publicId!;
+  }
+
   compareConversation(o1: Pick<IConversation, 'id'> | null, o2: Pick<IConversation, 'id'> | null): boolean {
     return o1 && o2 ? this.getConversationIdentifier(o1) === this.getConversationIdentifier(o2) : o1 === o2;
   }
@@ -101,6 +105,29 @@ export class ConversationService {
     return conversationCollection;
   }
 
+  findForConnectedUser(req?: any): Observable<EntityArrayResponseType> {
+    const options = createRequestOption(req);
+    return this.http
+      .get<RestConversation[]>(`${this.resourceUrl}/for-connected-user`,
+        { params: options, observe: 'response' })
+      .pipe(map(res => this.convertResponseArrayFromServer(res)));
+  }
+
+  partialUpdateForConnectedUser(conversation: PartialUpdateConversation): Observable<EntityResponseType> {
+    const copy = this.convertDateFromClient(conversation);
+    if(conversation.publicId) {
+      return this.http
+        .patch<RestConversation>(`${this.resourceUrl}/for-connected-user/${conversation.publicId}`, copy, { observe: 'response' })
+        .pipe(map(res => this.convertResponseFromServer(res)));
+    } else {
+      throw new Error();
+    }
+  }
+
+  deleteForConnectedUser(publicId: string): Observable<HttpResponse<{}>> {
+    return this.http.delete(`${this.resourceUrl}/for-connected-user/${publicId}`, { observe: 'response' });
+  }
+
   protected convertDateFromClient<T extends IConversation | NewConversation | PartialUpdateConversation>(conversation: T): RestOf<T> {
     return {
       ...conversation,
@@ -112,8 +139,8 @@ export class ConversationService {
   protected convertDateFromServer(restConversation: RestConversation): IConversation {
     return {
       ...restConversation,
-      createdDate: restConversation.createdDate ? dayjs(restConversation.createdDate) : undefined,
-      lastModifiedDate: restConversation.lastModifiedDate ? dayjs(restConversation.lastModifiedDate) : undefined,
+      createdDate: restConversation.createdDate ? dayjs.unix(Number(restConversation.createdDate)) : undefined,
+      lastModifiedDate: restConversation.lastModifiedDate ? dayjs.unix(Number(restConversation.lastModifiedDate)) : undefined,
     };
   }
 

@@ -1,12 +1,10 @@
 package fr.codecake.chatgptchallenge.service;
 
 import fr.codecake.chatgptchallenge.domain.Profile;
-import fr.codecake.chatgptchallenge.domain.Profile_;
 import fr.codecake.chatgptchallenge.domain.User;
 import fr.codecake.chatgptchallenge.domain.enumeration.UserSubscription;
 import fr.codecake.chatgptchallenge.repository.ProfileRepository;
 import fr.codecake.chatgptchallenge.service.dto.ProfileDTO;
-import fr.codecake.chatgptchallenge.service.dto.UserDTO;
 import fr.codecake.chatgptchallenge.service.mapper.ProfileMapper;
 
 import java.util.Optional;

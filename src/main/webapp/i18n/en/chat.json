@@ -1,0 +1,17 @@
+{
+  "chatgptChallengeApp": {
+    "chat": {
+      "title": "ChatGPT - Challenge",
+      "alert": {
+        "rename": {
+          "success": "Conversation renamed successfuly",
+          "error": "Error occurred when renaming your conversation: {{error}}"
+        },
+        "delete": {
+          "success": "Conversation deleted successfuly",
+          "error": "Error occurred when deleting your conversation: {{error}}"
+        }
+      }
+    }
+  }
+}

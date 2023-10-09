@@ -209,7 +209,7 @@ public class ConversationResource {
     }
 
     /**
-     * {@code PATCH  /conversations/for-connected-user/:id : Partial updates given fields of an existing conversation, field will ignore if it is null
+     * {@code PATCH  /conversations/for-connected-user/:public-id } : Partial updates given fields of an existing conversation, field will ignore if it is null
      *
      * @param publicId the publicId of the conversationDTO to save.
      * @param conversationDTO the conversationDTO to update.
@@ -244,6 +244,12 @@ public class ConversationResource {
         return ResponseUtil.wrapOrNotFound(result);
     }
 
+    /**
+     * {@code DELETE  /conversations/for-connected-user/:public-id} : delete the conversation for the given public id.
+     *
+     * @param publicId the public id of the conversationDTO to delete.
+     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
+     */
     @DeleteMapping("/conversations/for-connected-user/{public-id}")
     public ResponseEntity<Void> deleteConversation(@PathVariable(name = "public-id") String publicId) {
         log.debug("REST request to delete Conversation : {}", publicId);

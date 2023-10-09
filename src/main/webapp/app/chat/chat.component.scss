@@ -1,0 +1,51 @@
+@import '../../content/scss/bootstrap-variables';
+
+#controls {
+  width: 250px;
+  height: 100%;
+}
+
+#conversations {
+  height: 100%;
+}
+
+#intermediate-container-list {
+  width: 100%;
+}
+
+#list {
+  height: calc(100% - 50px);
+  overflow-y: scroll;
+}
+
+.btn-conversation {
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
+
+#chat {
+  background-color: $gray-700;
+}
+
+.month {
+  margin-left: 13px;
+  color: $gray-500;
+}
+
+.actions {
+  width: 50px;
+}
+
+.input-name {
+  height: 23px;
+}
+
+.actions fa-icon {
+  cursor: pointer;
+  color: $gray-500;
+}
+
+.actions fa-icon:hover,  {
+  color: $white;
+}
