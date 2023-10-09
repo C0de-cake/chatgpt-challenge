@@ -226,7 +226,7 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
- application:
-   openai:
-     key: to-specify
-     url: https://api.openai.com/v1
+application:
+  openai:
+    key: to-specify
+    url: https://api.openai.com/v1
