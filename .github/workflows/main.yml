@@ -49,6 +49,7 @@ jobs:
           CYPRESS_ENABLE_RECORD: true
           CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET}}
+          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+          APPLICATION_OPENAI_KEY: ${{ secrets.OPENAI_API_KEY }}
       - name: 'E2E: Teardown'
         run: npm run ci:e2e:teardown
