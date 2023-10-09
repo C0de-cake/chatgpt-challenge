@@ -25,7 +25,6 @@ spring:
       maximumPoolSize: 2
       schema: ${SCHEMA_DB}
   jpa:
-    database-platform: tech.jhipster.domain.util.FixedPostgreSQL10Dialect
     liquibase:
       contexts: prod
   security:
