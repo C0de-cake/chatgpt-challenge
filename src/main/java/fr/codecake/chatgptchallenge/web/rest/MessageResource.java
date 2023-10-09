@@ -1,6 +1,7 @@
 package fr.codecake.chatgptchallenge.web.rest;
 
 import fr.codecake.chatgptchallenge.repository.MessageRepository;
+import fr.codecake.chatgptchallenge.security.AuthoritiesConstants;
 import fr.codecake.chatgptchallenge.service.MessageService;
 import fr.codecake.chatgptchallenge.service.dto.MessageDTO;
 import fr.codecake.chatgptchallenge.web.rest.errors.BadRequestAlertException;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -54,6 +56,7 @@ public class MessageResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/messages")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<MessageDTO> createMessage(@RequestBody MessageDTO messageDTO) throws URISyntaxException {
         log.debug("REST request to save Message : {}", messageDTO);
         if (messageDTO.getId() != null) {
@@ -77,6 +80,7 @@ public class MessageResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/messages/{id}")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<MessageDTO> updateMessage(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody MessageDTO messageDTO
@@ -112,6 +116,7 @@ public class MessageResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/messages/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<MessageDTO> partialUpdateMessage(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody MessageDTO messageDTO
@@ -143,6 +148,7 @@ public class MessageResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of messages in body.
      */
     @GetMapping("/messages")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<List<MessageDTO>> getAllMessages(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         log.debug("REST request to get a page of Messages");
         Page<MessageDTO> page = messageService.findAll(pageable);
@@ -157,6 +163,7 @@ public class MessageResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the messageDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/messages/{id}")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<MessageDTO> getMessage(@PathVariable Long id) {
         log.debug("REST request to get Message : {}", id);
         Optional<MessageDTO> messageDTO = messageService.findOne(id);
@@ -170,6 +177,7 @@ public class MessageResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/messages/{id}")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> deleteMessage(@PathVariable Long id) {
         log.debug("REST request to delete Message : {}", id);
         messageService.delete(id);

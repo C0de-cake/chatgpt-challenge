@@ -10,6 +10,7 @@ import fr.codecake.chatgptchallenge.IntegrationTest;
 import fr.codecake.chatgptchallenge.domain.Message;
 import fr.codecake.chatgptchallenge.domain.enumeration.Owner;
 import fr.codecake.chatgptchallenge.repository.MessageRepository;
+import fr.codecake.chatgptchallenge.security.AuthoritiesConstants;
 import fr.codecake.chatgptchallenge.service.dto.MessageDTO;
 import fr.codecake.chatgptchallenge.service.mapper.MessageMapper;
 import jakarta.persistence.EntityManager;
@@ -32,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @IntegrationTest
 @AutoConfigureMockMvc
-@WithMockUser
+@WithMockUser(authorities = AuthoritiesConstants.ADMIN)
 class MessageResourceIT {
 
     private static final String DEFAULT_CONTENT = "AAAAAAAAAA";

@@ -1,6 +1,7 @@
 package fr.codecake.chatgptchallenge.web.rest;
 
 import fr.codecake.chatgptchallenge.repository.ProfileRepository;
+import fr.codecake.chatgptchallenge.security.AuthoritiesConstants;
 import fr.codecake.chatgptchallenge.service.ProfileService;
 import fr.codecake.chatgptchallenge.service.dto.ProfileDTO;
 import fr.codecake.chatgptchallenge.web.rest.errors.BadRequestAlertException;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -54,6 +56,7 @@ public class ProfileResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/profiles")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<ProfileDTO> createProfile(@RequestBody ProfileDTO profileDTO) throws URISyntaxException {
         log.debug("REST request to save Profile : {}", profileDTO);
         if (profileDTO.getId() != null) {
@@ -77,6 +80,7 @@ public class ProfileResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/profiles/{id}")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<ProfileDTO> updateProfile(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody ProfileDTO profileDTO
@@ -112,6 +116,7 @@ public class ProfileResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/profiles/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<ProfileDTO> partialUpdateProfile(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody ProfileDTO profileDTO
@@ -143,6 +148,7 @@ public class ProfileResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of profiles in body.
      */
     @GetMapping("/profiles")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<List<ProfileDTO>> getAllProfiles(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         log.debug("REST request to get a page of Profiles");
         Page<ProfileDTO> page = profileService.findAll(pageable);
@@ -157,6 +163,7 @@ public class ProfileResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the profileDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/profiles/{id}")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<ProfileDTO> getProfile(@PathVariable Long id) {
         log.debug("REST request to get Profile : {}", id);
         Optional<ProfileDTO> profileDTO = profileService.findOne(id);
@@ -170,6 +177,7 @@ public class ProfileResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/profiles/{id}")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> deleteProfile(@PathVariable Long id) {
         log.debug("REST request to delete Profile : {}", id);
         profileService.delete(id);

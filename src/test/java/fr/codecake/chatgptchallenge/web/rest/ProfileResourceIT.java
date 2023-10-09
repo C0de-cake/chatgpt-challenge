@@ -11,6 +11,7 @@ import fr.codecake.chatgptchallenge.IntegrationTest;
 import fr.codecake.chatgptchallenge.domain.Profile;
 import fr.codecake.chatgptchallenge.domain.enumeration.UserSubscription;
 import fr.codecake.chatgptchallenge.repository.ProfileRepository;
+import fr.codecake.chatgptchallenge.security.AuthoritiesConstants;
 import fr.codecake.chatgptchallenge.service.dto.ProfileDTO;
 import fr.codecake.chatgptchallenge.service.mapper.ProfileMapper;
 import jakarta.persistence.EntityManager;
@@ -33,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @IntegrationTest
 @AutoConfigureMockMvc
-@WithMockUser
+@WithMockUser(authorities = AuthoritiesConstants.ADMIN)
 public class ProfileResourceIT {
 
     private static final UserSubscription DEFAULT_SUBSCRIPTION = UserSubscription.FREE;
